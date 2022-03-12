@@ -6,6 +6,7 @@ public class QitemCustom {
     private int quantityMin;
     private int quantityMax;
 
+    public QitemCustom() {}
     // Range Q-items
     public QitemCustom(int i, int qMin, int qMax) {
         this.item = i;
@@ -26,7 +27,7 @@ public class QitemCustom {
     public int getQuantityMin() {
         return this.quantityMin;
     }
-    public int getQteMax() {
+    public int getQuantityMax() {
         return this.quantityMax;
     }
     public void setItem(int i) {
