@@ -21,73 +21,58 @@ import ca.pfv.spmf.tools.MemoryLogger;
 
 public class AlgoFHUQIMinerCustom {
 
+    // System
     /** Output file path */
     public String outputFile;
-
     /** Input file path */
     public String inputDatabase;
-
     /** Object to write results to file */
     private BufferedWriter writer_hqui = null;
 
-//Maps
+    // Maps
     /** map of a qitem to  its TWU */
-    private Hashtable<QitemCustom, Integer> mapItemToTwu;
+    private Hashtable<QitemCustom, Integer> mapItemToTWU;
     /** map of an item to its profit */
     private Hashtable<Integer, Integer> mapItemToProfit;
     /** map of transasction to its utility */
     private Hashtable<Integer, Integer> mapTransactionToUtility;
-
     /** map of an item to its FMAP */
     private Map<QitemCustom, Map<QitemCustom, Integer>> mapFMAP;
 
-//Algorithm Parameters
+    // Algorithm Parameters
     /** minimum utility threshold */
     private long minUtil;
-
     /** total utility */
-    private long totalU;
-
-    /** coefficient */
+    private long totalUtil;
+    /** qrc coefficient */
     private int coefficient;
-
     /** combining method */
     private EnumCombination combiningMethod;
 
-//For Evaluation
-
+    // For Evaluation
     /** start and end time */
-    private long startTime;
-
-    /** end time */
-    private long endTime;
-
+    private long startTime, endTime;
     /** percent */
     private float percent;
-
     /** number of HUQIs that have been found */
     private int HUQIcount = 0;
-
     /** number of utility lists */
     private int countUL = 0;
-
     /** number of construction for utility lists */
     private int countConstruct = 0;
-
     /** the current Qitem */
     private QitemCustom currentQitem;
-
     /** the size of a temporary buffer for storing itemsets */
     private final int BUFFERS_SIZE = 200;
-
     /** a temporary buffer for storing itemsets */
-    private QitemCustom[] itemsetBuffer = null;
+    private QitemCustom[] qItemsetBuffer = null;
 
     /** Constructor */
     public AlgoFHUQIMinerCustom() {
     }
 
-    public void runAlgorithm(String inputData, String inputProfit, float percentage, int coef,
+    /** Execution function */
+    public void runAlgorithm(String inputData, String inputProfit, float percentage, int coeff,
                              EnumCombination combineMethod, String output) throws IOException {
         System.gc();
 
@@ -95,34 +80,33 @@ public class AlgoFHUQIMinerCustom {
         MemoryLogger.getInstance().reset();
         startTime = System.currentTimeMillis();
         writer_hqui = new BufferedWriter(new FileWriter(output));
-        itemsetBuffer = new QitemCustom[BUFFERS_SIZE];
-        coefficient = coef;
+        qItemsetBuffer = new QitemCustom[BUFFERS_SIZE];
+        coefficient = coeff;
         percent = percentage;
         combiningMethod = combineMethod;
-        mapItemToProfit = new Hashtable<Integer, Integer>();
-        mapTransactionToUtility = new Hashtable<Integer, Integer>();
-        totalU = 0;
+        mapItemToProfit = new Hashtable<>();
+        mapTransactionToUtility = new Hashtable<>();
+        totalUtil = 0;
 
-        ArrayList<QitemCustom> qitemNameList = new ArrayList<QitemCustom>();
-        Hashtable<QitemCustom, UtilityListFHUQIMinerCustom> mapItemToUtilityList =
-                new Hashtable<QitemCustom, UtilityListFHUQIMinerCustom>();
+        ArrayList<QitemCustom> qItemNameList = new ArrayList<>();
+        Hashtable<QitemCustom, UtilityListFHUQIMinerCustom> mapItemToUtilityList = new Hashtable<>();
 
         System.out.println("1. Build Initial Q-Utility Lists");
-        buildInitialQUtilityLists(inputData, inputProfit, qitemNameList, mapItemToUtilityList);
+        buildInitialQUtilityLists(inputData, inputProfit, qItemNameList, mapItemToUtilityList);
         MemoryLogger.getInstance().checkMemory();
 
         System.out.println("2. Find Initial High Utility Range Q-items");
-        ArrayList<QitemCustom> candidateList = new ArrayList<QitemCustom>();
-        ArrayList<QitemCustom> hwQUI = new ArrayList<QitemCustom>();
-        findInitialRHUQIs(qitemNameList, mapItemToUtilityList, candidateList, hwQUI);
+        ArrayList<QitemCustom> candidateList = new ArrayList<>();
+        ArrayList<QitemCustom> hwQUI = new ArrayList<>();
+        findInitialRHUQIs(qItemNameList, mapItemToUtilityList, candidateList, hwQUI);
         MemoryLogger.getInstance().checkMemory();
 
-        System.out.println("3. Recurcive Mining Procedure");
-        miner(itemsetBuffer, 0, null, mapItemToUtilityList, qitemNameList, writer_hqui, hwQUI);
+        System.out.println("3. Recursive Mining Procedure");
+        miner(qItemsetBuffer, 0, null, mapItemToUtilityList, qItemNameList, writer_hqui, hwQUI);
         MemoryLogger.getInstance().checkMemory();
         endTime = System.currentTimeMillis();
 
-//		writeFileStatistics();
+        // writeFileStatistics();
         writer_hqui.close();
     }
 
@@ -132,7 +116,7 @@ public class AlgoFHUQIMinerCustom {
      * @param @inputData
      */
     public void printStatistics() {
-        System.out.println("============= FHUQI-MINER v 2.45 Statistical results===============");
+        System.out.println("============= FHUQI-MINER v 2.45 Statistical results ===============");
         System.out.println("MinUtil(%): " + percent);
         System.out.println("Coefficient:" + coefficient);
         System.out.println("HUQIcount:" + HUQIcount);
@@ -149,11 +133,11 @@ public class AlgoFHUQIMinerCustom {
      *                             quantities
      * @param inputProfit          the input file path for items with profit
      *                             information
-     * @param qitemNameList        the list of qitems
+     * @param qItemNameList        the list of qitems
      * @param mapItemToUtilityList a map of each qitem to its utility list
      * @throws IOException if error while reading or writing to file
      */
-    private void buildInitialQUtilityLists(String inputData, String inputProfit, ArrayList<QitemCustom> qitemNameList,
+    private void buildInitialQUtilityLists(String inputData, String inputProfit, ArrayList<QitemCustom> qItemNameList,
                                            Hashtable<QitemCustom, UtilityListFHUQIMinerCustom> mapItemToUtilityList)
             throws IOException {
 
@@ -176,7 +160,7 @@ public class AlgoFHUQIMinerCustom {
         br_profitTable.close();
 
         // Build mapItemToTWU
-        mapItemToTwu = new Hashtable<QitemCustom, Integer>();
+        mapItemToTWU = new Hashtable<>();
         int tid = 0;
         currentQitem = new QitemCustom(0, 0);
         QitemCustom Q;
@@ -200,21 +184,21 @@ public class AlgoFHUQIMinerCustom {
                         new String(s.substring(s.indexOf(',') + 1, s.length()))));
                 Q = new QitemCustom();
                 Q.copy(currentQitem);
-                if (!mapItemToTwu.containsKey(Q))
-                    mapItemToTwu.put(Q, transactionU);
+                if (!mapItemToTWU.containsKey(Q))
+                    mapItemToTWU.put(Q, transactionU);
                 else
-                    mapItemToTwu.put(Q, mapItemToTwu.get(Q) + transactionU);
+                    mapItemToTWU.put(Q, mapItemToTWU.get(Q) + transactionU);
             }
-            totalU += transactionU;
+            totalUtil += transactionU;
         }
-        minUtil = (long) (totalU * percent);
+        minUtil = (long) (totalUtil * percent);
 
         // Build mapItemToUtilityList
-        for (QitemCustom item : mapItemToTwu.keySet()) {
-            if (mapItemToTwu.get(item) >= Math.floor(minUtil / coefficient)) {
+        for (QitemCustom item : mapItemToTWU.keySet()) {
+            if (mapItemToTWU.get(item) >= Math.floor(minUtil / coefficient)) {
                 UtilityListFHUQIMinerCustom ul = new UtilityListFHUQIMinerCustom(item, 0);
                 mapItemToUtilityList.put(item, ul);
-                qitemNameList.add(item);
+                qItemNameList.add(item);
             }
         }
         br_inputDatabase.close();
@@ -282,7 +266,7 @@ public class AlgoFHUQIMinerCustom {
         }
         MemoryLogger.getInstance().checkMemory();
         // Sort the final list of Q-itemsets according to their utilities
-        Collections.sort(qitemNameList, new Comparator<>() {
+        Collections.sort(qItemNameList, new Comparator<>() {
             public int compare(QitemCustom o1, QitemCustom o2) {
                 return compareQItems(o1, o2);
             }
@@ -338,6 +322,9 @@ public class AlgoFHUQIMinerCustom {
 
     }
 
+
+
+    // Combining methods
     /**
      * Combine method
      * @param prefix a prefix
@@ -372,7 +359,7 @@ public class AlgoFHUQIMinerCustom {
     }
 
     /**
-     * The combine all combination method
+     * Combine All
      *
      * @param prefix               a prefix of an itemset
      * @param prefixLength         the length of the prefix
@@ -467,7 +454,7 @@ public class AlgoFHUQIMinerCustom {
     }
 
     /**
-     * The combine min combination method
+     * Combine Min
      *
      * @param prefix               a prefix of an itemset
      * @param prefixLength         the length of the prefix
@@ -593,7 +580,7 @@ public class AlgoFHUQIMinerCustom {
     }
 
     /**
-     * The combine max combination method
+     * Combine Max
      *
      * @param prefix               a prefix of an itemset
      * @param prefixLength         the length of the prefix
@@ -694,6 +681,9 @@ public class AlgoFHUQIMinerCustom {
         MemoryLogger.getInstance().checkMemory();
     }
 
+
+
+    // Utility Itemset methods
     /**
      * Method to construct the utility list of an itemset
      *
@@ -824,6 +814,9 @@ public class AlgoFHUQIMinerCustom {
         return null;
     }
 
+
+
+    // Main algorithm
     /**
      * The main pattern mining procedure
      *
@@ -941,14 +934,17 @@ public class AlgoFHUQIMinerCustom {
             }
             MemoryLogger.getInstance().checkMemory();
             if (nextNameList.size() >= 1) { // recurcive call
-                itemsetBuffer[prefixLength] = qItemNameList.get(i);
-                miner(itemsetBuffer, prefixLength + 1, ULs.get(qItemNameList.get(i)), nextHUL, nextNameList,
+                qItemsetBuffer[prefixLength] = qItemNameList.get(i);
+                miner(qItemsetBuffer, prefixLength + 1, ULs.get(qItemNameList.get(i)), nextHUL, nextNameList,
                         br_writer_hqui, nextHWQUI);
             }
 
         }
     }
 
+
+
+    // Post-processing methods
     /**
      * Write an itemset to file
      *
@@ -959,7 +955,8 @@ public class AlgoFHUQIMinerCustom {
      * @param utility      the utility of the itemset
      * @throws IOException if error while writing to file
      */
-    private void writeOut1(QitemCustom[] prefix, int prefixLength, QitemCustom x, QitemCustom y, long utility) throws IOException {
+    private void writeOut1(QitemCustom[] prefix, int prefixLength,
+                           QitemCustom x, QitemCustom y, long utility) throws IOException {
 
         // Create a string buffer
         StringBuilder buffer = new StringBuilder();
@@ -1045,6 +1042,9 @@ public class AlgoFHUQIMinerCustom {
 
     }
 
+
+
+    // Comparing methods
     /**
      * Comparator to order qItems
      *
