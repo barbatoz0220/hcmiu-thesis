@@ -5,18 +5,9 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer.EnumCombination;
-import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom.QitemCustom;
-import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom.QItemTransCustom;
-import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom.UtilityListFHUQIMinerCustom;
 import ca.pfv.spmf.tools.MemoryLogger;
 
 public class AlgoFHUQIMinerCustom {
@@ -31,11 +22,11 @@ public class AlgoFHUQIMinerCustom {
 
     // Maps
     /** map of a qitem to  its TWU */
-    private Hashtable<QitemCustom, Integer> mapItemToTWU;
+    private Hashtable<QitemCustom, Integer> twuTable;
     /** map of an item to its profit */
-    private Hashtable<Integer, Integer> mapItemToProfit;
+    private Hashtable<Integer, Integer> profitTable;
     /** map of transasction to its utility */
-    private Hashtable<Integer, Integer> mapTransactionToUtility;
+    private Hashtable<Integer, Integer> transactionUtility;
     /** map of an item to its FMAP */
     private Map<QitemCustom, Map<QitemCustom, Integer>> mapFMAP;
 
@@ -84,24 +75,24 @@ public class AlgoFHUQIMinerCustom {
         coefficient = coeff;
         percent = percentage;
         combiningMethod = combineMethod;
-        mapItemToProfit = new Hashtable<>();
-        mapTransactionToUtility = new Hashtable<>();
+        profitTable = new Hashtable<>();
+        transactionUtility = new Hashtable<>();
         totalUtil = 0;
 
         ArrayList<QitemCustom> qItemNameList = new ArrayList<>();
         Hashtable<QitemCustom, UtilityListFHUQIMinerCustom> mapItemToUtilityList = new Hashtable<>();
 
-        System.out.println("1. Build Initial Q-Utility Lists");
+        System.out.println("Stage 1. Build Initial Q-Utility Lists");
         buildInitialQUtilityLists(inputData, inputProfit, qItemNameList, mapItemToUtilityList);
         MemoryLogger.getInstance().checkMemory();
 
-        System.out.println("2. Find Initial High Utility Range Q-items");
+        System.out.println("Stage 2. Find Initial High Utility Range Q-items");
         ArrayList<QitemCustom> candidateList = new ArrayList<>();
         ArrayList<QitemCustom> hwQUI = new ArrayList<>();
         findInitialRHUQIs(qItemNameList, mapItemToUtilityList, candidateList, hwQUI);
         MemoryLogger.getInstance().checkMemory();
 
-        System.out.println("3. Recursive Mining Procedure");
+        System.out.println("Stage 3. Recursive Mining Procedure");
         miner(qItemsetBuffer, 0, null, mapItemToUtilityList, qItemNameList, writer_hqui, hwQUI);
         MemoryLogger.getInstance().checkMemory();
         endTime = System.currentTimeMillis();
@@ -118,6 +109,7 @@ public class AlgoFHUQIMinerCustom {
     public void printStatistics() {
         System.out.println("============= FHUQI-MINER v 2.45 Statistical results ===============");
         System.out.println("MinUtil(%): " + percent);
+        System.out.println("MinUtil threshold: " + minUtil);
         System.out.println("Coefficient:" + coefficient);
         System.out.println("HUQIcount:" + HUQIcount);
         System.out.println("Runtime: " + (double) (endTime - startTime) / 1000 + " (s)");
@@ -144,7 +136,7 @@ public class AlgoFHUQIMinerCustom {
         BufferedReader br_profitTable = new BufferedReader(new FileReader(inputProfit));
         BufferedReader br_inputDatabase = new BufferedReader(new FileReader(inputData));
 
-        // Build mapItemToProfit
+        // Build profitTable
         String str;
         while ((str = br_profitTable.readLine()) != null) {
             String[] itemProfit = str.split(", ");
@@ -154,59 +146,69 @@ public class AlgoFHUQIMinerCustom {
                 if (profit == 0)
                     profit = 1;
                 int item = Integer.parseInt(itemProfit[0]);
-                mapItemToProfit.put(item, profit);
+                profitTable.put(item, profit);
             }
         }
         br_profitTable.close();
 
-        // Build mapItemToTWU
-        mapItemToTWU = new Hashtable<>();
+        /***
+         * @1st database scan
+         * Build TWU for all items
+         */
+        twuTable = new Hashtable<>();
         int tid = 0;
         currentQitem = new QitemCustom(0, 0);
         QitemCustom Q;
         while ((str = br_inputDatabase.readLine()) != null) {
             tid++;
-            String[] itemInfo = str.split(" ");// (A,2) (B, 5)
-            int transactionU = 0;
-            for (int i = 0; i < itemInfo.length; i++) {
-                currentQitem.setItem(Integer.parseInt(new String(itemInfo[i].substring(0, itemInfo[i].indexOf(',')))));
-                currentQitem.setQuantityMin(Integer.parseInt(
-                        new String(itemInfo[i].substring(itemInfo[i].indexOf(',') + 1, itemInfo[i].length()))));
-                currentQitem.setQuantityMax(Integer.parseInt(
-                        new String(itemInfo[i].substring(itemInfo[i].indexOf(',') + 1, itemInfo[i].length()))));
-                transactionU += currentQitem.getQuantityMin() * mapItemToProfit.get(currentQitem.getItem());
-            }
+            String[] itemInfo = str.split(" ");// (A,2) (B,5)
+            int transactionUtil = 0;
+            // Calculate all transaction utilities
             for (String s : itemInfo) {
-                currentQitem.setItem(Integer.parseInt(new String(s.substring(0, s.indexOf(',')))));
-                currentQitem.setQuantityMin(Integer.parseInt(
-                        new String(s.substring(s.indexOf(',') + 1, s.length()))));
-                currentQitem.setQuantityMin(Integer.parseInt(
-                        new String(s.substring(s.indexOf(',') + 1, s.length()))));
+                int itemName = Integer.parseInt(s.substring(0, s.indexOf(',')));
+                int i_util = Integer.parseInt(s.substring(s.indexOf(',') + 1));
+                transactionUtil += i_util * profitTable.get(itemName);
+            }
+            // Match the TWU to all items in transaction - add new items or increase TWU values
+            for (String s : itemInfo) {
+                int i_util = Integer.parseInt(s.substring(s.indexOf(',') + 1));
+                currentQitem.setItem(Integer.parseInt(s.substring(0, s.indexOf(','))));
+                currentQitem.setQuantityMin(i_util);
+                currentQitem.setQuantityMax(i_util);
                 Q = new QitemCustom();
                 Q.copy(currentQitem);
-                if (!mapItemToTWU.containsKey(Q))
-                    mapItemToTWU.put(Q, transactionU);
-                else
-                    mapItemToTWU.put(Q, mapItemToTWU.get(Q) + transactionU);
+                if (!twuTable.containsKey(Q))
+                    // For new items, add entry to TWU table
+                    twuTable.put(Q, transactionUtil);
+                else {
+                    // For existing items, increase TWU for entry
+                    int oldTWU = twuTable.get(Q);
+                    int newTWU = oldTWU + transactionUtil;
+                    twuTable.put(Q, newTWU);
+                }
             }
-            totalUtil += transactionU;
+            totalUtil += transactionUtil;
         }
+//        System.out.println(twuTable);
+        // Set the minimum utility of that database
         minUtil = (long) (totalUtil * percent);
-
-        // Build mapItemToUtilityList
-        for (QitemCustom item : mapItemToTWU.keySet()) {
-            if (mapItemToTWU.get(item) >= Math.floor(minUtil / coefficient)) {
-                UtilityListFHUQIMinerCustom ul = new UtilityListFHUQIMinerCustom(item, 0);
-                mapItemToUtilityList.put(item, ul);
+        // Pruning with TWU - potential HUQI will have their UtilList created
+        for (QitemCustom item : twuTable.keySet()) {
+            if (twuTable.get(item) >= Math.floor(minUtil / coefficient)) {
+//                System.out.println(item + "\t" + twuTable.get(item) + "\t" + "Passed");
+                UtilityListFHUQIMinerCustom itemUtilList = new UtilityListFHUQIMinerCustom(item, 0);
+                mapItemToUtilityList.put(item, itemUtilList);
                 qItemNameList.add(item);
             }
         }
         br_inputDatabase.close();
         MemoryLogger.getInstance().checkMemory();
 
-        // Build MapFmap with MapItemToUtilityList
+        /***
+         * @2nd database scan
+         * Build TQCS Structure (FMap) with MapItemToUtilityList
+         ***/
         br_inputDatabase = new BufferedReader(new FileReader(inputData));
-        str = "";
         tid = 0;
         mapFMAP = new HashMap<QitemCustom, Map<QitemCustom, Integer>>();
         while ((str = br_inputDatabase.readLine()) != null) {
@@ -216,68 +218,81 @@ public class AlgoFHUQIMinerCustom {
             int remainingUtility = 0;
             Integer newTWU = 0; // NEW OPTIMIZATION
             List<QitemCustom> revisedTransaction = new ArrayList<>();
-            for (int i = 0; i < itemInfo.length; i++) {
+            for (String s : itemInfo) {
                 Q = new QitemCustom();
-                Q.setItem(Integer.valueOf(new String(itemInfo[i].substring(0, itemInfo[i].indexOf(',')))));
-                Q.setQuantityMin(Integer.valueOf(
-                        new String(itemInfo[i].substring(itemInfo[i].indexOf(',') + 1, itemInfo[i].length()))));
-                Q.setQuantityMax(Integer.valueOf(
-                        new String(itemInfo[i].substring(itemInfo[i].indexOf(',') + 1, itemInfo[i].length()))));
+                int i_util = Integer.parseInt(s.substring(s.indexOf(',') + 1));
+                Q.setItem(Integer.parseInt(s.substring(0, s.indexOf(','))));
+                Q.setQuantityMin(i_util);
+                Q.setQuantityMax(i_util);
                 if (mapItemToUtilityList.containsKey(Q)) {
                     revisedTransaction.add(Q);
-                    remainingUtility += Q.getQuantityMin() * mapItemToProfit.get(Q.getItem());
-                    newTWU += Q.getQuantityMin() * mapItemToProfit.get(Q.getItem());
+                    remainingUtility += Q.getQuantityMin() * profitTable.get(Q.getItem());
+                    newTWU += Q.getQuantityMin() * profitTable.get(Q.getItem());
                 }
-                mapTransactionToUtility.put(tid, newTWU);
-            } // end for
+                transactionUtility.put(tid, newTWU);
+//                System.out.println(transactionUtility);
+            }
+            // Reorder the transaction being reviewed in (decreasing utility) order
             Collections.sort(revisedTransaction, new Comparator<QitemCustom>() {
                 public int compare(QitemCustom o1, QitemCustom o2) {
                     return compareQItems(o1, o2);
                 }
             });
-
+            // System.out.println("Revised transaction " + tid + ": " + revisedTransaction);
+            // After the transaction is re-ordered
             for (int i = 0; i < revisedTransaction.size(); i++) {
                 QitemCustom q = revisedTransaction.get(i);
-                // subtract the utility of this item from the remaining utility
-                remainingUtility = remainingUtility - q.getQuantityMin() * mapItemToProfit.get(q.getItem());
+                // subtract the utility of this item from the remaining utility to get the rUtil for that item
+                remainingUtility -= q.getQuantityMin() * profitTable.get(q.getItem());
                 // get the utility list of this item
                 UtilityListFHUQIMinerCustom utilityListOfItem = mapItemToUtilityList.get(q);
-                // Add a new Element to the utility list of this item corresponding to this
-                // transaction
-                QItemTransCustom element = new QItemTransCustom(tid, q.getQuantityMin() * mapItemToProfit.get(q.getItem()),
+                // Add a new Element to the utility list of this item corresponding to this transaction
+                QItemTransCustom elementTransaction = new QItemTransCustom(tid,
+                        q.getQuantityMin() * profitTable.get(q.getItem()),
                         remainingUtility);
-                utilityListOfItem.addTrans(element);
-                utilityListOfItem.addTWU(mapTransactionToUtility.get(tid));
+                utilityListOfItem.addTrans(elementTransaction);
+                utilityListOfItem.addTWU(transactionUtility.get(tid));
                 // BEGIN NEW OPTIMIZATION
+                // If current item doesn't have TQCS yet, create new TQCS
                 Map<QitemCustom, Integer> mapFMAPItem = mapFMAP.get(q);
                 if (mapFMAPItem == null) {
                     mapFMAPItem = new HashMap<>();
                     mapFMAP.put(q, mapFMAPItem);
                 }
+                // After evaluating and creating TQCS of item
                 for (int j = i + 1; j < revisedTransaction.size(); j++) {
                     QitemCustom qAfter = revisedTransaction.get(j);
-                    Integer twu = mapFMAPItem.get(qAfter);
-                    if (twu == null)
+                    Integer existingTWU = mapFMAPItem.get(qAfter);
+                    /* Print out all the following items in the revised transaction and the TWUs with current item */
+//                    System.out.println("qAfter: " + qAfter + "\tTWU: " + existingTWU + "\tNew TWU: " + newTWU);
+
+                    /* If the TQCS between current item and qAfter doesn't exist, C = newTWU
+                     * Otherwise, if <item, qAfter, c> already exists, C = newTWU + existingTWU
+                     * */
+                    if (existingTWU == null)
                         mapFMAPItem.put(qAfter, newTWU);
                     else
-                        mapFMAPItem.put(qAfter, twu + newTWU);
+                        mapFMAPItem.put(qAfter, existingTWU + newTWU);
                 }
+                // Print out all the TQCSs after traversing all following items in revised transaction
+                // System.out.println(mapFMAP);
             }
         }
         MemoryLogger.getInstance().checkMemory();
-        // Sort the final list of Q-itemsets according to their utilities
+        // Sort the final list of Q-itemsets according to their utilities (in decreasing utility order)
         Collections.sort(qItemNameList, new Comparator<>() {
             public int compare(QitemCustom o1, QitemCustom o2) {
                 return compareQItems(o1, o2);
             }
         });
+//        System.out.println(qItemNameList);
         MemoryLogger.getInstance().checkMemory();
     }
 
     /**
      * Find the initial RHUQIs
      *
-     * @param qitemNameList        a list of qitems
+     * @param qitemNameList        a list of qitems (sorted in decreasing utility order)
      * @param mapItemToUtilityList a map from qitems to their utility lists
      * @param candidateList        a list of candidate q-items
      * @param hwQUI                another list
@@ -290,36 +305,39 @@ public class AlgoFHUQIMinerCustom {
         // Check if a Q-itemset is:
         // 1. High,
         // 2. Candidate,
-        // 3. To be explored or to be directly prunned
+        // 3. To be explored or to be directly pruned
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < qitemNameList.size(); i++) {
-            long utility = mapItemToUtilityList.get(qitemNameList.get(i)).getSumIUtils();
-            if (utility >= minUtil) {
+        for (QitemCustom qitem : qitemNameList) {
+            long sum_iutil = mapItemToUtilityList.get(qitem).getSumIUtils();
+            long sum_rutil = mapItemToUtilityList.get(qitem).getSumRUtils();
+            // High utility already -> hwQUI (set H)
+            if (sum_iutil >= minUtil) {
                 sb.delete(0, sb.length());
-                sb.append(qitemNameList.get(i));
+                sb.append(qitem);
                 sb.append(" #UTIL: ");
-                sb.append(utility);
+                sb.append(sum_iutil);
                 sb.append("\r\n");
                 writer_hqui.write(sb.toString());
-                hwQUI.add(qitemNameList.get(i));
+                hwQUI.add(qitem);
                 HUQIcount++;
             } else {
-                if ((combiningMethod != EnumCombination.COMBINEMAX && utility >= Math.floor(minUtil / coefficient))
-                        || (combiningMethod == EnumCombination.COMBINEMAX && utility >= Math.floor(minUtil / 2))) {
-                    candidateList.add(qitemNameList.get(i));
+                // To be extended - set E
+                if (sum_iutil + sum_rutil >= minUtil) {
+                    hwQUI.add(qitem);
                 }
-                if (utility + mapItemToUtilityList.get(qitemNameList.get(i)).getSumRUtils() >= minUtil) {
-
-                    hwQUI.add(qitemNameList.get(i));
+                // To be combined - set C
+                if ((combiningMethod != EnumCombination.COMBINEMAX && sum_iutil >= Math.floor(minUtil / coefficient))
+                        || (combiningMethod == EnumCombination.COMBINEMAX && sum_iutil >= Math.floor(minUtil / 2))) {
+                    candidateList.add(qitem);
                 }
             }
-
+//            System.out.println("Counted HUQI:" + HUQIcount + "\t" + "Set H: " + hwQUI);
+//            System.out.println("Current C set: " + candidateList + "\n");
         }
         MemoryLogger.getInstance().checkMemory();
         // Perform the combination process on the candidate q-itemsets
         combineMethod(null, 0, candidateList, qitemNameList, mapItemToUtilityList, hwQUI);
-
     }
 
 
@@ -372,25 +390,8 @@ public class AlgoFHUQIMinerCustom {
     private void combineAll(QitemCustom[] prefix, int prefixLength, ArrayList<QitemCustom> candidateList,
                             ArrayList<QitemCustom> qItemNameList, Hashtable<QitemCustom, UtilityListFHUQIMinerCustom> mapItemToUtilityList,
                             ArrayList<QitemCustom> hwQUI) throws IOException {
-        // delete non necessary candidate q-items
-        int s = 1;
-        while (s < candidateList.size() - 1) {
-            if (((candidateList.get(s).getQuantityMin() == candidateList.get(s - 1).getQuantityMax() + 1)
-                    && (candidateList.get(s).getItem() == candidateList.get(s - 1).getItem()))
-                    || ((candidateList.get(s).getQuantityMax() == candidateList.get(s + 1).getQuantityMin() - 1)
-                    && (candidateList.get(s).getItem() == candidateList.get(s + 1).getItem())))
-                s++;
-            else
-                candidateList.remove(s);
-        }
-        if (candidateList.size() > 2) {
-            if ((candidateList.get(candidateList.size() - 1)
-                    .getQuantityMin() != candidateList.get(candidateList.size() - 2).getQuantityMax() + 1)
-                    || (candidateList.get(candidateList.size() - 2).getItem() != candidateList
-                    .get(candidateList.size() - 1).getItem()))
-                candidateList.remove(candidateList.size() - 1);
-        }
-
+        // Delete non necessary candidate q-items
+        deleteUnnecessaryCandidate(candidateList);
         // make the combination process
         Map<QitemCustom, UtilityListFHUQIMinerCustom> mapRangeToUtilityList = new HashMap<>();
 
@@ -470,23 +471,7 @@ public class AlgoFHUQIMinerCustom {
                             ArrayList<QitemCustom> hwQUI) throws IOException {
 
         // delete non necessary candidate q-items
-        int s = 1;
-        while (s < candidateList.size() - 1) {
-            if (((candidateList.get(s).getQuantityMin() == candidateList.get(s - 1).getQuantityMax() + 1)
-                    && (candidateList.get(s).getItem() == candidateList.get(s - 1).getItem()))
-                    || ((candidateList.get(s).getQuantityMax() == candidateList.get(s + 1).getQuantityMin() - 1)
-                    && (candidateList.get(s).getItem() == candidateList.get(s + 1).getItem())))
-                s++;
-            else
-                candidateList.remove(s);
-        }
-        if (candidateList.size() > 2) {
-            if ((candidateList.get(candidateList.size() - 1)
-                    .getQuantityMin() != candidateList.get(candidateList.size() - 2).getQuantityMax() + 1)
-                    || (candidateList.get(candidateList.size() - 2).getItem() != candidateList
-                    .get(candidateList.size() - 1).getItem()))
-                candidateList.remove(candidateList.size() - 1);
-        }
+        deleteUnnecessaryCandidate(candidateList);
 
         // make the combination process
         int count;
@@ -595,23 +580,7 @@ public class AlgoFHUQIMinerCustom {
                             Hashtable<QitemCustom, UtilityListFHUQIMinerCustom> mapItemToUtilityList,
                             ArrayList<QitemCustom> hwQUI) throws IOException {
         // delete non necessary candidate q-items
-        int s = 1;
-        while (s < candidateList.size() - 1) {
-            if (((candidateList.get(s).getQuantityMin() == candidateList.get(s - 1).getQuantityMax() + 1)
-                    && (candidateList.get(s).getItem() == candidateList.get(s - 1).getItem()))
-                    || ((candidateList.get(s).getQuantityMax() == candidateList.get(s + 1).getQuantityMin() - 1)
-                    && (candidateList.get(s).getItem() == candidateList.get(s + 1).getItem())))
-                s++;
-            else
-                candidateList.remove(s);
-        }
-        if (candidateList.size() > 2) {
-            if ((candidateList.get(candidateList.size() - 1)
-                    .getQuantityMin() != candidateList.get(candidateList.size() - 2).getQuantityMax() + 1)
-                    || (candidateList.get(candidateList.size() - 2).getItem() != candidateList
-                    .get(candidateList.size() - 1).getItem()))
-                candidateList.remove(candidateList.size() - 1);
-        }
+        deleteUnnecessaryCandidate(candidateList);
 
         // make the combination process
         ArrayList<QitemCustom> temporaryArrayList = new ArrayList<>();
@@ -694,7 +663,7 @@ public class AlgoFHUQIMinerCustom {
     private UtilityListFHUQIMinerCustom constructForCombine(UtilityListFHUQIMinerCustom ulQitem1,
                                                             UtilityListFHUQIMinerCustom ulQitem2) {
 
-        UtilityListFHUQIMinerCustom result = new UtilityListFHUQIMinerCustom(new QitemCustom(ulQitem1.getSingleItemsetName().getItem(),
+        UtilityListFHUQIMinerCustom resultUtilityList = new UtilityListFHUQIMinerCustom(new QitemCustom(ulQitem1.getSingleItemsetName().getItem(),
                 ulQitem1.getSingleItemsetName().getQuantityMin(), ulQitem2.getSingleItemsetName().getQuantityMax()));
 
         ArrayList<QItemTransCustom> temp1 = ulQitem1.getQItemTransCustom();
@@ -702,11 +671,11 @@ public class AlgoFHUQIMinerCustom {
 
         ArrayList<QItemTransCustom> mainlist = new ArrayList<>();
 
-        result.setSumIUtils(ulQitem1.getSumIUtils() + ulQitem2.getSumIUtils());
+        resultUtilityList.setSumIUtils(ulQitem1.getSumIUtils() + ulQitem2.getSumIUtils());
 
-        result.setSumRUtils(ulQitem1.getSumRUtils() + ulQitem2.getSumRUtils());
+        resultUtilityList.setSumRUtils(ulQitem1.getSumRUtils() + ulQitem2.getSumRUtils());
 
-        result.setTwu(ulQitem1.getTwu() + ulQitem2.getTwu());
+        resultUtilityList.setTwu(ulQitem1.getTwu() + ulQitem2.getTwu());
 
         int i = 0, j = 0;
         while (i < temp1.size() && j < temp2.size()) {
@@ -728,9 +697,9 @@ public class AlgoFHUQIMinerCustom {
                 mainlist.add(temp1.get(i++));
             }
         }
-        result.setQItemTransCustom(mainlist);
+        resultUtilityList.setQItemTransCustom(mainlist);
         MemoryLogger.getInstance().checkMemory();
-        return result;
+        return resultUtilityList;
     }
 
     /**
@@ -765,7 +734,7 @@ public class AlgoFHUQIMinerCustom {
 
                     if (qT1.get(i).getRu() >= qT2.get(j).getRu()) {
                         QItemTransCustom temp = new QItemTransCustom(tid1, eu1 + eu2, qT2.get(j).getRu());
-                        res.addTrans(temp, mapTransactionToUtility.get(tid1));
+                        res.addTrans(temp, transactionUtility.get(tid1));
                     }
                     i++;
                     j++;
@@ -796,7 +765,7 @@ public class AlgoFHUQIMinerCustom {
 
                     if (qT1.get(i).getRu() >= qT2.get(j).getRu()) {
                         QItemTransCustom temp = new QItemTransCustom(tid1, eu1 + eu2 - preEU, qT2.get(j).getRu());
-                        res.addTrans(temp, mapTransactionToUtility.get(tid1));
+                        res.addTrans(temp, transactionUtility.get(tid1));
                     }
                     i++;
                     j++;
@@ -833,28 +802,28 @@ public class AlgoFHUQIMinerCustom {
                        Hashtable<QitemCustom, UtilityListFHUQIMinerCustom> ULs,
                        ArrayList<QitemCustom> qItemNameList, BufferedWriter br_writer_hqui,
                        ArrayList<QitemCustom> hwQUI) throws IOException {
-        // For pruning range Q-itemsets using MapFmap
+        // For pruning range Q-itemsets using TWU
         int[] t2 = new int[coefficient];
         ArrayList<QitemCustom> nextNameList = new ArrayList<QitemCustom>();
 
         for (int i = 0; i < qItemNameList.size(); i++) {
-
             nextNameList.clear();
             ArrayList<QitemCustom> nextHWQUI = new ArrayList<>();
             ArrayList<QitemCustom> candidateList = new ArrayList<>();
             Hashtable<QitemCustom, UtilityListFHUQIMinerCustom> nextHUL = new Hashtable<>();
             Hashtable<QitemCustom, UtilityListFHUQIMinerCustom> candidateHUL = new Hashtable<>();
-
-            if (!hwQUI.contains(qItemNameList.get(i)))
+            if (!hwQUI.contains(qItemNameList.get(i))) {
                 continue;
+            }
 
             if (qItemNameList.get(i).isRange()) {
+//                System.out.println(qItemNameList.get(i));
                 for (int ii = qItemNameList.get(i).getQuantityMin(); ii <= qItemNameList.get(i).getQuantityMax(); ii++) {
                     t2[ii - qItemNameList.get(i).getQuantityMin()] = qItemNameList
                             .indexOf(new QitemCustom(qItemNameList.get(i).getItem(), ii));
                 }
             }
-
+//            System.out.println(Arrays.toString(t2));
             for (int j = i + 1; j < qItemNameList.size(); j++) {
 
                 if (qItemNameList.get(j).isRange())
@@ -866,38 +835,23 @@ public class AlgoFHUQIMinerCustom {
                 UtilityListFHUQIMinerCustom afterUL = null;
 
                 // Co-occurence pruning strategy
-                Map<QitemCustom, Integer> mapTWUF = mapFMAP.get(qItemNameList.get(i));
-                if (mapTWUF != null) {
-                    Integer twuF = mapTWUF.get(qItemNameList.get(j));
-                    if (twuF == null || twuF < Math.floor(minUtil / coefficient))
+                Integer sumTWU = 0;
+                for (int ii = qItemNameList.get(i).getQuantityMin(); ii <= qItemNameList.get(i).getQuantityMax(); ii++) {
+                    Integer sum = mapFMAP.get(
+                            qItemNameList.get(Math.min(t2[ii - qItemNameList.get(i).getQuantityMin()], j)))
+                            .get(qItemNameList.get(Math.max(t2[ii - qItemNameList.get(i).getQuantityMin()], j)));
+                    if (sum == null)
+                        continue;
+                    sumTWU += sum;
+                }
+                if (sumTWU < Math.floor(minUtil / coefficient))
                         continue;
                     else {
-                        afterUL = constructForJoin(ULs.get(qItemNameList.get(i)), ULs.get(qItemNameList.get(j)),
-                                prefixUL);
-                        countConstruct++;
-                        if (afterUL == null || afterUL.getTwu() < Math.floor(minUtil / coefficient))
-                            continue;
-                    }
-                } else {// In case of range Q-itemsets
-                    Integer sumtwu = 0;
-                    Integer sum = 0;
-                    for (int ii = qItemNameList.get(i).getQuantityMin(); ii <= qItemNameList.get(i).getQuantityMax(); ii++) {
-                        sum = mapFMAP.get(qItemNameList.get(Math.min(t2[ii - qItemNameList.get(i).getQuantityMin()], j)))
-                                .get(qItemNameList.get(Math.max(t2[ii - qItemNameList.get(i).getQuantityMin()], j)));
-                        if (sum == null)
-                            continue;
-                        sumtwu = sumtwu + sum;
-                    }
-
-                    if (sumtwu == null || sumtwu < Math.floor(minUtil / coefficient))
+                    afterUL = constructForJoin(ULs.get(qItemNameList.get(i)), ULs.get(qItemNameList.get(j)),
+                            prefixUL);
+                    countConstruct++;
+                    if (afterUL == null || afterUL.getTwu() < Math.floor(minUtil / coefficient))
                         continue;
-                    else {
-                        afterUL = constructForJoin(ULs.get(qItemNameList.get(i)), ULs.get(qItemNameList.get(j)),
-                                prefixUL);
-                        countConstruct++;
-                        if (afterUL == null || afterUL.getTwu() < Math.floor(minUtil / coefficient))
-                            continue;
-                    }
                 }
 
                 if (afterUL != null && afterUL.getTwu() >= Math.floor(minUtil / coefficient)) {
@@ -1053,8 +1007,8 @@ public class AlgoFHUQIMinerCustom {
      * @return the comparison result
      */
     private int compareQItems(QitemCustom q1, QitemCustom q2) {
-        int compare = (int) ((q2.getQuantityMin() * mapItemToProfit.get(q2.getItem()))
-                - (q1.getQuantityMin() * mapItemToProfit.get(q1.getItem())));
+        int compare = (int) ((q2.getQuantityMin() * profitTable.get(q2.getItem()))
+                - (q1.getQuantityMin() * profitTable.get(q1.getItem())));
         // if the same, use the lexical order otherwise use the TWU
         return (compare == 0) ? q1.getItem() - q2.getItem() : compare;
     }
@@ -1075,5 +1029,27 @@ public class AlgoFHUQIMinerCustom {
         return compare;
     }
 
+    private void deleteUnnecessaryCandidate(ArrayList<QitemCustom> inputCandidateList) {
+        int s = 1;
+        while (s < inputCandidateList.size() - 1) {
+            /* If the quantityMax of item before S is smaller than quantityMin of S by 1 unit
+            or If the quantityMin of the item after S is larger than quantityMax of S by 1 unit
+            */
+            if (((inputCandidateList.get(s).getQuantityMin() == inputCandidateList.get(s - 1).getQuantityMax() + 1)
+                    && (inputCandidateList.get(s).getItem() == inputCandidateList.get(s - 1).getItem()))
+                    || ((inputCandidateList.get(s).getQuantityMax() == inputCandidateList.get(s + 1).getQuantityMin() - 1)
+                    && (inputCandidateList.get(s).getItem() == inputCandidateList.get(s + 1).getItem())))
+                s++;
+            else
+                inputCandidateList.remove(s);
+        }
+        if (inputCandidateList.size() > 2) {
+            if ((inputCandidateList.get(inputCandidateList.size() - 1)
+                    .getQuantityMin() != inputCandidateList.get(inputCandidateList.size() - 2).getQuantityMax() + 1)
+                    || (inputCandidateList.get(inputCandidateList.size() - 2).getItem() != inputCandidateList
+                    .get(inputCandidateList.size() - 1).getItem()))
+                inputCandidateList.remove(inputCandidateList.size() - 1);
+        }
+    }
 }
 

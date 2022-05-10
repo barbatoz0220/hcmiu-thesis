@@ -54,7 +54,7 @@ public class AlgoFHUQIMiner {
 	private BufferedWriter writer_hqui = null;
 
 //Maps
-	/** map of a qitem to  its TWU */
+	/** map of a qitem to its TWU */
 	private Hashtable<Qitem, Integer> mapItemToTwu;
 	/** map of an item to its profit */
 	private Hashtable<Integer, Integer> mapItemToProfit;
@@ -79,7 +79,7 @@ public class AlgoFHUQIMiner {
 
 //For Evaluation
 
-	/** start and end time */
+	/** start time */
 	private long startTime;
 
 	/** end time */
@@ -102,9 +102,12 @@ public class AlgoFHUQIMiner {
 
 	/** the size of a temporary buffer for storing itemsets */
 	private final int BUFFERS_SIZE = 200;
-	
+
 	/** a temporary buffer for storing itemsets */
 	private Qitem[] itemsetBuffer = null;
+
+	/** if true, display debug information */
+	private final boolean DEBUG_MODE = false;
 
 	/** Constructor */
 	public AlgoFHUQIMiner() {
@@ -117,11 +120,11 @@ public class AlgoFHUQIMiner {
 	 * @param inputProfit       path to the profit information of each item
 	 * @param percentage        percentage
 	 * @param coef              coefficient
-	 * @param combinationmethod the combination method (1 = CombineMin, 2 =
-	 *                          CombineMax, 3 = CombineAll)
-	 * @param outputPath            the output file path
+	 * @param combinationmethod the combination method CombineMin, CombineMax,
+	 *                          CombineAll)
+	 * @param outputPath        the output file path
 	 * @throws IOException if exception while reading or writing to file
-	 **/
+	 */
 	public void runAlgorithm(String inputData, String inputProfit, float percentage, int coef,
 			EnumCombination combinationmethod, String output) throws IOException {
 		System.gc();
@@ -144,13 +147,11 @@ public class AlgoFHUQIMiner {
 		System.out.println("1. Build Initial Q-Utility Lists");
 		buildInitialQUtilityLists(inputData, inputProfit, qitemNameList, mapItemToUtilityList);
 		MemoryLogger.getInstance().checkMemory();
-
 		System.out.println("2. Find Initial High Utility Range Q-items");
 		ArrayList<Qitem> candidateList = new ArrayList<Qitem>();
 		ArrayList<Qitem> hwQUI = new ArrayList<Qitem>();
 		findInitialRHUQIs(qitemNameList, mapItemToUtilityList, candidateList, hwQUI);
 		MemoryLogger.getInstance().checkMemory();
-
 		System.out.println("3. Recurcive Mining Procedure");
 		miner(itemsetBuffer, 0, null, mapItemToUtilityList, qitemNameList, writer_hqui, hwQUI);
 		MemoryLogger.getInstance().checkMemory();
@@ -169,7 +170,7 @@ public class AlgoFHUQIMiner {
 		System.out.println("============= FHUQI-MINER v 2.45 Statistical results===============");
 		System.out.println("MinUtil(%): " + percent);
 		System.out.println("Coefficient:" + coefficient);
-		System.out.println("HUQIcount:" + HUQIcount);
+		System.out.println("HUQIcount: " + HUQIcount);
 		System.out.println("Runtime: " + (double) (endTime - startTime) / 1000 + " (s)");
 		System.out.println("Memory usage: " + MemoryLogger.getInstance().getMaxMemory() + " (Mb)");
 		System.out.println("Join opertaion count: " + countConstruct);
@@ -241,6 +242,7 @@ public class AlgoFHUQIMiner {
 			totalU += transactionU;
 		}
 		minUtil = (long) (totalU * percent);
+//		System.out.println(" " + minUtil);
 
 		// Build mapItemToUtilityList
 		for (Qitem item : mapItemToTwu.keySet()) {
@@ -372,14 +374,15 @@ public class AlgoFHUQIMiner {
 
 	/**
 	 * Combine method
-	 * @param prefix a prefix
-	 * @param prefixLength the length of the prefix
-	 * @param candidateList the candidate list
-	 * @param qItemNameList the qtiem list
+	 * 
+	 * @param prefix               a prefix
+	 * @param prefixLength         the length of the prefix
+	 * @param candidateList        the candidate list
+	 * @param qItemNameList        the qtiem list
 	 * @param mapItemToUtilityList a map of item to utility list
-	 * @param hwQUI hwQUI
+	 * @param hwQUI                hwQUI
 	 * @return the result
-	 * @throws IOException
+	 * @throws IOException if error while writing to file
 	 */
 	ArrayList<Qitem> combineMethod(Qitem[] prefix, int prefixLength, ArrayList<Qitem> candidateList,
 			ArrayList<Qitem> qItemNameList, Hashtable<Qitem, UtilityListFHUQIMiner> mapItemToUtilityList,

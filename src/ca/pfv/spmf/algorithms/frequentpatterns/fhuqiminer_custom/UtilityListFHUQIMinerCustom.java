@@ -41,12 +41,12 @@ public class UtilityListFHUQIMinerCustom {
 
     /**
      * Constructor
-     * @param name a q-item
+     * @param qitem a q-item
      * @param twu the twu
      */
-    public UtilityListFHUQIMinerCustom(QitemCustom name, long twu) {
+    public UtilityListFHUQIMinerCustom(QitemCustom qitem, long twu) {
         this.itemsetName = new ArrayList<QitemCustom>();
-        this.itemsetName.add(name);
+        this.itemsetName.add(qitem);
         this.sumIUtils = 0;
         this.sumRUtils = 0;
         this.twu = twu;
