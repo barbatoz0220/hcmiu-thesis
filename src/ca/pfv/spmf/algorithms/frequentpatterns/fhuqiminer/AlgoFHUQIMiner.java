@@ -493,6 +493,8 @@ public class AlgoFHUQIMiner {
 							mapItemToUtilityList.put(res.getSingleItemsetName(), res);
 							int site = qItemNameList.indexOf(candidateList.get(j));
 							qItemNameList.add(site, res.getSingleItemsetName());
+							System.out.println("HWQUI:" + hwQUI);
+							System.out.println("Promising: " + qItemNameList);
 						}
 					}
 				}
@@ -875,7 +877,7 @@ public class AlgoFHUQIMiner {
 		ArrayList<Qitem> nextNameList = new ArrayList<Qitem>();
 
 		for (int i = 0; i < qItemNameList.size(); i++) {
-
+			System.out.println("Current promising items: " + qItemNameList);
 			nextNameList.clear();
 			ArrayList<Qitem> nextHWQUI = new ArrayList<Qitem>();
 			ArrayList<Qitem> candidateList = new ArrayList<Qitem>();

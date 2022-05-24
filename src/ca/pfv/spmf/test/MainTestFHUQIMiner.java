@@ -36,13 +36,19 @@ public class MainTestFHUQIMiner {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		// Paper dataset (from the example in paper)
-//		String inputFileProfitPath = fileToPath("dbHUQI_paper_p.txt");
-//		String inputFileDBPath = fileToPath("dbHUQI_paper.txt");
-//		float minUtilThreshold = 0.25f;
-//		int qrc = 5;
+//		 Paper dataset (from the example in paper)
+		String inputFileProfitPath = fileToPath("dbHUQI_paper_p.txt");
+		String inputFileDBPath = fileToPath("dbHUQI_paper.txt");
+		float minUtilThreshold = 0.01f;
+		int qrc = 10;
 //		String output = "results\\paper\\output_paper.txt";
-//		String output = "results\\paper\\output_paper_custom_test.txt";
+//		String output = "results\\paper\\output_paper(max).txt";
+//		String output = "results\\paper\\output_paper(min).txt";
+//		String output = "results\\paper\\output_paper_custom.txt";
+//		String output = "results\\paper\\output_paper_custom(min).txt";
+//		String output = "results\\paper\\output_paper_custom(max).txt";
+		String output = "results\\paper\\output_paper_custom_test.txt";
+//		String output = "results\\paper\\output_paper_custom_test(max).txt";
 
 
 		// FOODMART DATASET
@@ -53,22 +59,24 @@ public class MainTestFHUQIMiner {
 //		String output = "results\\foodmart\\output_foodmart.txt";
 //		String output = "results\\foodmart\\output_foodmart(max).txt";
 //		String output = "results\\foodmart\\output_foodmart(min).txt";
-//		String output = "results\\foodmart\\output_foodmart_custom_test2.txt";
+//		String output = "results\\foodmart\\output_foodmart_custom_test.txt";
+//		String output = "results\\foodmart\\output_foodmart_custom_test3.txt";
 //		String output = "results\\foodmart\\output_foodmart_custom(max).txt";
+//		String output = "results\\foodmart\\output_foodmart_custom_test3(max).txt";
 //		String output = "results\\foodmart\\output_foodmart_custom(min).txt";
 
 
 		// BMS2 DATASET
-		String inputFileProfitPath = fileToPath("datasets\\bmsf2_p.txt");
-		String inputFileDBPath = fileToPath("datasets\\bms2.txt");
-		float minUtilThreshold = 0.001f;
-		int qrc = 10;
+//		String inputFileProfitPath = fileToPath("datasets\\bmsf2_p.txt");
+//		String inputFileDBPath = fileToPath("datasets\\bms2.txt");
+//		float minUtilThreshold = 0.001f;
+//		int qrc = 10;
 //		String output = "results\\bms2\\output_bms2.txt";
 //		String output = "results\\bms2\\output_bms2(max).txt";
 //		String output = "results\\bms2\\output_bms2(min).txt";
 //		String output = "results\\bms2\\output_bms2_custom_test2.txt";
 //		String output = "results\\bms2\\output_bms2_custom(max).txt";
-		String output = "results\\bms2\\output_bms2_custom(min)_test2.txt";
+//		String output = "results\\bms2\\output_bms2_custom(min)_test2.txt";
 
 
 //		// RETAIL DATASET
@@ -92,17 +100,18 @@ public class MainTestFHUQIMiner {
 //		String output = "results\\pumsb\\output_pumsb.txt";
 //		String output = "results\\pumsb\\output_pumsb(max).txt";
 //		String output = "results\\pumsb\\output_pumsb(min).txt";
-//		String output = "results\\pumsb\\output_pumsb_custom_test2.txt";
+//		String output = "results\\pumsb\\output_pumsb_custom.txt";
 //		String output = "results\\pumsb\\output_pumsb_custom(max).txt";
 //		String output = "results\\pumsb\\output_pumsb_custom(min).txt";
+//		String output = "results\\pumsb\\output_pumsb_custom_test(max).txt";
 
 
 
 		// Run the algorithm
 		// The combination method  (there are three possibilities )
 //		EnumCombination combinationmethod = EnumCombination.COMBINEMAX;
-		EnumCombination combinationmethod = EnumCombination.COMBINEMIN;
-//		EnumCombination combinationmethod = EnumCombination.COMBINEALL;
+//		EnumCombination combinationmethod = EnumCombination.COMBINEMIN;
+		EnumCombination combinationmethod = EnumCombination.COMBINEALL;
 
 //		AlgoFHUQIMiner algo = new AlgoFHUQIMiner();
 		AlgoFHUQIMinerCustom algo = new AlgoFHUQIMinerCustom();
