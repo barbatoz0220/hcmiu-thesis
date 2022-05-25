@@ -388,7 +388,7 @@ public class AlgoFHUQIMinerCustom {
         deleteUnnecessaryCandidate(candidateList);
 
         // make the combination process
-        Map<QitemCustom, UtilityListCustom> mapRangeToUtilityList = new HashMap<QitemCustom, UtilityListCustom>();
+        Map<QitemCustom, UtilityListCustom> mapRangeToUtilityList = new HashMap<>();
 
         int count;
         for (int i = 0; i < candidateList.size(); i++) {
@@ -405,7 +405,7 @@ public class AlgoFHUQIMinerCustom {
 
                     if (j == i + 1) {
 
-                        if (candidateList.get(j).getQuantityMin() != candidateList.get(i).getQuantityMax() + 1)
+                        if (candidateList.get(j).getQuantityMin()!= candidateList.get(i).getQuantityMax()+ 1)
                             break;
 
                         res = constructForCombine(mapItemToUtilityList.get(candidateList.get(i)),
@@ -441,6 +441,8 @@ public class AlgoFHUQIMinerCustom {
                             mapItemToUtilityList.put(res.getSingleItemsetName(), res);
                             int site = promisingQItems.indexOf(candidateList.get(j));
                             promisingQItems.add(site, res.getSingleItemsetName());
+//                            System.out.println("HWQUI:" + hwQUI);
+//                            System.out.println("Promising: " + promisingQItems);
                         }
                     }
                 }
@@ -824,14 +826,16 @@ public class AlgoFHUQIMinerCustom {
 
                 // Co-occurrence pruning strategy
                 Integer sumTWU = 0;
-                for (int ii = promisingQItems.get(i).getQuantityMin(); ii <= promisingQItems.get(i).getQuantityMax(); ii++) {
-                    Integer sum = mapFMAP
-                            .get(promisingQItems.get(Math.min(t2[ii - promisingQItems.get(i).getQuantityMin()], j)))
-                            .get(promisingQItems.get(Math.max(t2[ii - promisingQItems.get(i).getQuantityMin()], j)));
-                    if (sum == null)
-                        continue;
-                    sumTWU += sum;
-                }
+                // Custom Test condition: still checks if TWU is null because range Q-items
+                if (mapFMAP.get(promisingQItems.get(i)) == null)
+                    for (int ii = promisingQItems.get(i).getQuantityMin(); ii <= promisingQItems.get(i).getQuantityMax(); ii++) {
+                        Integer sum = mapFMAP
+                                .get(promisingQItems.get(Math.min(t2[ii - promisingQItems.get(i).getQuantityMin()], j)))
+                                .get(promisingQItems.get(Math.max(t2[ii - promisingQItems.get(i).getQuantityMin()], j)));
+                        if (sum == null)
+                            continue;
+                        sumTWU += sum;
+                    }
                 if (sumTWU < Math.floor(minUtil / coefficient))
                     continue;
                 else {

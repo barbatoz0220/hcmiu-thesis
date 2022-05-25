@@ -493,8 +493,6 @@ public class AlgoFHUQIMiner {
 							mapItemToUtilityList.put(res.getSingleItemsetName(), res);
 							int site = qItemNameList.indexOf(candidateList.get(j));
 							qItemNameList.add(site, res.getSingleItemsetName());
-							System.out.println("HWQUI:" + hwQUI);
-							System.out.println("Promising: " + qItemNameList);
 						}
 					}
 				}
@@ -505,7 +503,7 @@ public class AlgoFHUQIMiner {
 
 	/**
 	 * The combine min combination method
-	 * 
+	 *
 	 * @param prefix               a prefix of an itemset
 	 * @param prefixLength         the length of the prefix
 	 * @param candidateList        a list of candidate qitems
@@ -630,7 +628,7 @@ public class AlgoFHUQIMiner {
 
 	/**
 	 * The combine max combination method
-	 * 
+	 *
 	 * @param prefix               a prefix of an itemset
 	 * @param prefixLength         the length of the prefix
 	 * @param candidateList        a list of candidate qitems
@@ -731,7 +729,7 @@ public class AlgoFHUQIMiner {
 
 	/**
 	 * Method to construct the utility list of an itemset
-	 * 
+	 *
 	 * @param ulQitem1 the utility list of a qitem
 	 * @param ulQitem2 the utility list of another qitem
 	 * @return the resulting utility list
@@ -779,7 +777,7 @@ public class AlgoFHUQIMiner {
 
 	/**
 	 * Method to join two utility lists
-	 * 
+	 *
 	 * @param ul1 the utility list of an item
 	 * @param ul2 the utility list of another item
 	 * @param ul0 the utility list of the prefix
@@ -859,7 +857,7 @@ public class AlgoFHUQIMiner {
 
 	/**
 	 * The main pattern mining procedure
-	 * 
+	 *
 	 * @param prefix         a prefix itemset
 	 * @param prefixLength   the length of the prefix
 	 * @param prefixUL       the utility list of the prefix
@@ -877,7 +875,7 @@ public class AlgoFHUQIMiner {
 		ArrayList<Qitem> nextNameList = new ArrayList<Qitem>();
 
 		for (int i = 0; i < qItemNameList.size(); i++) {
-			System.out.println("Current promising items: " + qItemNameList);
+
 			nextNameList.clear();
 			ArrayList<Qitem> nextHWQUI = new ArrayList<Qitem>();
 			ArrayList<Qitem> candidateList = new ArrayList<Qitem>();
