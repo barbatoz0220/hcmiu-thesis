@@ -2,7 +2,7 @@ package ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom;
 
 
 import java.util.ArrayList;
-public class UtilityListFHUQIMinerCustom {
+public class UtilityListCustom {
     private ArrayList<QitemCustom> itemsetName;
     private long sumIUtils;
     private long sumRUtils;
@@ -10,7 +10,7 @@ public class UtilityListFHUQIMinerCustom {
 
     private ArrayList<QItemTransCustom> qItemTrans = null;
 
-    public UtilityListFHUQIMinerCustom(ArrayList<QitemCustom> qitemset, long twu) {
+    public UtilityListCustom(ArrayList<QitemCustom> qitemset, long twu) {
         // this.prefix="";
         this.itemsetName = new ArrayList<QitemCustom>();
         this.itemsetName = qitemset;
@@ -20,7 +20,7 @@ public class UtilityListFHUQIMinerCustom {
         this.qItemTrans = new ArrayList<QItemTransCustom>();
     }
 
-    public UtilityListFHUQIMinerCustom(ArrayList<QitemCustom> qitemset) {
+    public UtilityListCustom(ArrayList<QitemCustom> qitemset) {
         // this.prefix="";
         this.itemsetName = new ArrayList<QitemCustom>();
         this.itemsetName = qitemset;
@@ -30,7 +30,7 @@ public class UtilityListFHUQIMinerCustom {
         this.qItemTrans = new ArrayList<QItemTransCustom>();
     }
 
-    public UtilityListFHUQIMinerCustom(QitemCustom name) {
+    public UtilityListCustom(QitemCustom name) {
         this.itemsetName = new ArrayList<QitemCustom>();
         this.itemsetName.add(name);
         this.sumIUtils = 0;
@@ -44,7 +44,7 @@ public class UtilityListFHUQIMinerCustom {
      * @param qitem a q-item
      * @param twu the twu
      */
-    public UtilityListFHUQIMinerCustom(QitemCustom qitem, long twu) {
+    public UtilityListCustom(QitemCustom qitem, long twu) {
         this.itemsetName = new ArrayList<QitemCustom>();
         this.itemsetName.add(qitem);
         this.sumIUtils = 0;
@@ -53,7 +53,7 @@ public class UtilityListFHUQIMinerCustom {
         qItemTrans = new ArrayList<QItemTransCustom>();
     }
 
-    public UtilityListFHUQIMinerCustom() {
+    public UtilityListCustom() {
 
     }
 
@@ -124,7 +124,7 @@ public class UtilityListFHUQIMinerCustom {
         return x;
     }
 
-    public void addUtilityList2(UtilityListFHUQIMinerCustom next) {
+    public void addUtilityList2(UtilityListCustom next) {
         ArrayList<QItemTransCustom> temp = next.getQItemTransCustom();
         ArrayList<QItemTransCustom> mainlist = new ArrayList<QItemTransCustom>();
         this.sumIUtils += next.getSumIUtils();
