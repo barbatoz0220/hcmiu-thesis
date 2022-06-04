@@ -48,6 +48,7 @@ public class MainTestFHUQIMiner {
 //		String output = "results\\paper\\output_paper_custom(min).txt";
 //		String output = "results\\paper\\output_paper_custom(max).txt";
 //		String output = "results\\paper\\output_paper_custom_test3.txt";
+//		String output = "results\\paper\\output_paper_custom_test4.txt";
 //		String output = "results\\paper\\output_paper_custom_test(max).txt";
 
 
@@ -76,8 +77,10 @@ public class MainTestFHUQIMiner {
 //		String output = "results\\bms2\\output_bms2(max).txt";
 //		String output = "results\\bms2\\output_bms2(min).txt";
 //		String output = "results\\bms2\\output_bms2_custom_test2.txt";
+//		String output = "results\\bms2\\output_bms2_custom_test3.txt";
 //		String output = "results\\bms2\\output_bms2_custom(max)_test2.txt";
-		String output = "results\\bms2\\output_bms2_custom(min)_test2.txt";
+		String output = "results\\bms2\\output_bms2_custom(max)_test3.txt";
+//		String output = "results\\bms2\\output_bms2_custom(min)_test2.txt";
 
 
 //		// RETAIL DATASET
@@ -102,16 +105,16 @@ public class MainTestFHUQIMiner {
 //		String output = "results\\pumsb\\output_pumsb(max).txt";
 //		String output = "results\\pumsb\\output_pumsb(min).txt";
 //		String output = "results\\pumsb\\output_pumsb_custom.txt";
+//		String output = "results\\pumsb\\output_pumsb_custom_test2.txt";
 //		String output = "results\\pumsb\\output_pumsb_custom(max).txt";
 //		String output = "results\\pumsb\\output_pumsb_custom(min).txt";
-//		String output = "results\\pumsb\\output_pumsb_custom_test(max).txt";
-
+//		String output = "results\\pumsb\\output_pumsb_custom_test2(max).txt";
 
 
 		// Run the algorithm
 		// The combination method  (there are three possibilities )
-//		EnumCombination combinationmethod = EnumCombination.COMBINEMAX;
-		EnumCombination combinationmethod = EnumCombination.COMBINEMIN;
+		EnumCombination combinationmethod = EnumCombination.COMBINEMAX;
+//		EnumCombination combinationmethod = EnumCombination.COMBINEMIN;
 //		EnumCombination combinationmethod = EnumCombination.COMBINEALL;
 
 //		AlgoFHUQIMiner algo = new AlgoFHUQIMiner();

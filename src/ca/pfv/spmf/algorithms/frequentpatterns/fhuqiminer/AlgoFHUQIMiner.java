@@ -22,13 +22,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import ca.pfv.spmf.tools.MemoryLogger;
 
@@ -242,7 +236,6 @@ public class AlgoFHUQIMiner {
 			totalU += transactionU;
 		}
 		minUtil = (long) (totalU * percent);
-//		System.out.println(" " + minUtil);
 
 		// Build mapItemToUtilityList
 		for (Qitem item : mapItemToTwu.keySet()) {
@@ -671,7 +664,6 @@ public class AlgoFHUQIMiner {
 			count = 1;
 			for (int j = i + 1; j < candidateList.size(); j++) {
 				int nextItem = candidateList.get(j).getItem();
-				// System.out.println("nextItem is "+nextItem);
 				if (currentItem != nextItem)
 					break;
 				else {
@@ -681,7 +673,6 @@ public class AlgoFHUQIMiner {
 						res = constructForCombine(mapItemToUtilityList.get(candidateList.get(i)),
 								mapItemToUtilityList.get(candidateList.get(j)));
 						count++;
-						// System.out.println("name is "+res.getItemsetName()+", count is "+count);
 						if (count > coefficient - 1)
 							break;
 						mapRangeToUtilityList.put(res.getSingleItemsetName(), res);
@@ -875,7 +866,6 @@ public class AlgoFHUQIMiner {
 		ArrayList<Qitem> nextNameList = new ArrayList<Qitem>();
 
 		for (int i = 0; i < qItemNameList.size(); i++) {
-
 			nextNameList.clear();
 			ArrayList<Qitem> nextHWQUI = new ArrayList<Qitem>();
 			ArrayList<Qitem> candidateList = new ArrayList<Qitem>();
@@ -947,8 +937,7 @@ public class AlgoFHUQIMiner {
 								afterUL.getSumIutils());
 						HUQIcount++;
 						nextHWQUI.add(afterUL.getSingleItemsetName());
-						// System.out.println("next is "+afterUL.getSingleItemsetName()+"util is
-						// "+afterUL.getSumIutils());
+//						 System.out.println("next is " +afterUL.getSingleItemsetName()+" util is "+afterUL.getSumIutils());
 					} else {
 						if ((combiningMethod != EnumCombination.COMBINEMAX
 								&& afterUL.getSumIutils() >= Math.floor(minUtil / coefficient))
