@@ -163,7 +163,7 @@ public class AlgoFHUQIMinerCustom {
         QitemCustom Q;
         while ((str = br_inputDatabase.readLine()) != null) {
             tid++;
-            String[] itemInfo = str.split(" ");// (A,2) (B,5)
+            String[] itemInfo = str.split(" ");
             int transactionUtil = 0;
             // Calculate all transaction utilities
             for (String s : itemInfo) {
@@ -188,13 +188,11 @@ public class AlgoFHUQIMinerCustom {
             }
             totalUtil += transactionUtil;
         }
-//        System.out.println(twuTable);
         // Set the minimum utility of that database
         minUtil = (long) (totalUtil * percent);
         // Pruning with TWU - potential HUQI will have their UtilList created
         for (QitemCustom item : twuTable.keySet()) {
             if (twuTable.get(item) >= Math.floor(minUtil / coefficient)) {
-//                System.out.println(item + "\t" + twuTable.get(item) + "\t" + "Passed");
                 UtilityListCustom itemUtilList = new UtilityListCustom(item, 0);
                 mapItemToUtilityList.put(item, itemUtilList);
                 promisingQItems.add(item);
@@ -209,6 +207,12 @@ public class AlgoFHUQIMinerCustom {
          ***/
         br_inputDatabase = new BufferedReader(new FileReader(inputData));
         tid = 0;
+        // Sort the final list of Q-itemsets according to their utilities (in decreasing utility order)
+        promisingQItems.sort(new Comparator<>() {
+            public int compare(QitemCustom o1, QitemCustom o2) {
+                return compareQItems(o1, o2);
+            }
+        });
         mapFMAP = new HashMap<QitemCustom, Map<QitemCustom, Integer>>();
         while ((str = br_inputDatabase.readLine()) != null) {
             tid++;
@@ -229,7 +233,6 @@ public class AlgoFHUQIMinerCustom {
                     newTWU += Q.getQuantityMin() * profitTable.get(Q.getItem());
                 }
                 transactionUtility.put(tid, newTWU);
-//                System.out.println(transactionUtility);
             }
             // Reorder the transaction being reviewed in (decreasing utility) order
             revisedTransaction.sort(new Comparator<QitemCustom>() {
@@ -237,7 +240,6 @@ public class AlgoFHUQIMinerCustom {
                     return compareQItems(o1, o2);
                 }
             });
-
             // After the transaction is re-ordered
             for (int i = 0; i < revisedTransaction.size(); i++) {
                 QitemCustom q = revisedTransaction.get(i);
@@ -269,16 +271,6 @@ public class AlgoFHUQIMinerCustom {
                 }
             }
         }
-
-        MemoryLogger.getInstance().checkMemory();
-//        System.out.println("Before " + promisingQItems);
-        // Sort the final list of Q-itemsets according to their utilities (in decreasing utility order)
-        promisingQItems.sort(new Comparator<>() {
-            public int compare(QitemCustom o1, QitemCustom o2) {
-                return compareQItems(o1, o2);
-            }
-        });
-//        System.out.println("After " + promisingQItems);
         MemoryLogger.getInstance().checkMemory();
     }
 
@@ -299,7 +291,6 @@ public class AlgoFHUQIMinerCustom {
         // 1. High,
         // 2. Candidate,
         // 3. To be explored or to be directly pruned
-//        System.out.println("Promising set: " + promisingQItems);
         StringBuilder sb = new StringBuilder();
         for (QitemCustom qItem : promisingQItems) {
             long sum_iutil = mapItemToUtilityList.get(qItem).getSumIUtils();
@@ -326,10 +317,7 @@ public class AlgoFHUQIMinerCustom {
                 }
             }
         }
-//        System.out.println("Counted HUQI:" + HUQIcount
-//        + "\n" + "Set H: " + hwQUI
-//        + "\n" + "Current C set: " + candidateList + "\n");
-//        MemoryLogger.getInstance().checkMemory();
+        MemoryLogger.getInstance().checkMemory();
         // Perform the combination process on the candidate q-itemsets
         combineMethod(null, 0, candidateList, promisingQItems, mapItemToUtilityList, hwQUI);
     }
@@ -441,8 +429,6 @@ public class AlgoFHUQIMinerCustom {
                             mapItemToUtilityList.put(res.getSingleItemsetName(), res);
                             int site = promisingQItems.indexOf(candidateList.get(j));
                             promisingQItems.add(site, res.getSingleItemsetName());
-//                            System.out.println("HWQUI:" + hwQUI);
-//                            System.out.println("Promising: " + promisingQItems);
                         }
                     }
                 }
@@ -586,7 +572,6 @@ public class AlgoFHUQIMinerCustom {
             count = 1;
             for (int j = i + 1; j < candidateList.size(); j++) {
                 int nextItem = candidateList.get(j).getItem();
-                // System.out.println("nextItem is "+nextItem);
                 if (currentItem != nextItem)
                     break;
                 else {
@@ -596,7 +581,6 @@ public class AlgoFHUQIMinerCustom {
                         res = constructForCombine(mapItemToUtilityList.get(candidateList.get(i)),
                                 mapItemToUtilityList.get(candidateList.get(j)));
                         count++;
-                        // System.out.println("name is "+res.getItemsetName()+", count is "+count);
                         if (count > coefficient - 1)
                             break;
                         mapRangeToUtilityList.put(res.getSingleItemsetName(), res);
@@ -794,52 +778,47 @@ public class AlgoFHUQIMinerCustom {
         // For pruning range Q-itemsets using TQCS (MapFMap)
         int[] t2 = new int[coefficient];
         ArrayList<QitemCustom> nextNameList = new ArrayList<>();
+
         for (int i = 0; i < promisingQItems.size(); i++) {
-//            System.out.println("Current item: " + promisingQItems.get(i));
+            QitemCustom currentQitem = promisingQItems.get(i);
             nextNameList.clear();
             ArrayList<QitemCustom> nextHWQUI = new ArrayList<>();
             ArrayList<QitemCustom> candidateList = new ArrayList<>();
             Hashtable<QitemCustom, UtilityListCustom> nextHUL = new Hashtable<>();
             Hashtable<QitemCustom, UtilityListCustom> candidateHUL = new Hashtable<>();
-            if (!hwQUI.contains(promisingQItems.get(i))) {
-//                System.out.println("Skipped " + promisingQItems.get(i));
+            if (!hwQUI.contains(currentQitem)) {
                 continue;
             }
             // t2 is the map of positions for each exact Q-item within the range Q-item being considered
-            if (promisingQItems.get(i).isRange()) {
-//                System.out.println(promisingQItems.get(i) + " is range");
-//                System.out.println(promisingQItems);
+            if (currentQitem.isRange()) {
                 for (int ii = promisingQItems.get(i).getQuantityMin(); ii <= promisingQItems.get(i).getQuantityMax(); ii++) {
                     t2[ii - promisingQItems.get(i).getQuantityMin()] = promisingQItems.indexOf(new QitemCustom(promisingQItems.get(i).getItem(), ii));
                 }
             }
-//            System.out.println(Arrays.toString(t2));
 
             for (int j = i + 1; j < promisingQItems.size(); j++) {
                 if (promisingQItems.get(j).isRange())
                     continue;
 
-                if (promisingQItems.get(i).isRange() && j == i + 1)
+                if (currentQitem.isRange() && j == i + 1)
                     continue;
 
                 UtilityListCustom afterUL = null;
 
-                // Co-occurrence pruning strategy
-                Integer sumTWU = 0;
-                // Custom Test condition: still checks if TWU is null because range Q-items
-                if (mapFMAP.get(promisingQItems.get(i)) == null)
-                    for (int ii = promisingQItems.get(i).getQuantityMin(); ii <= promisingQItems.get(i).getQuantityMax(); ii++) {
-                        Integer sum = mapFMAP
-                                .get(promisingQItems.get(Math.min(t2[ii - promisingQItems.get(i).getQuantityMin()], j)))
-                                .get(promisingQItems.get(Math.max(t2[ii - promisingQItems.get(i).getQuantityMin()], j)));
-                        if (sum == null)
-                            continue;
-                        sumTWU += sum;
-                    }
+                // Improved co-occurrence pruning strategy
+                int sumTWU = 0;
+                for (int ii = currentQitem.getQuantityMin(); ii <= currentQitem.getQuantityMax(); ii++) {
+                    QitemCustom exactQitem = new QitemCustom(currentQitem.getItem(), ii);
+                    Integer sum = mapFMAP.get(exactQitem).get(promisingQItems.get(j));
+                    if (sum == null)
+                        continue;
+                    sumTWU += sum;
+                }
+
                 if (sumTWU < Math.floor(minUtil / coefficient))
                     continue;
                 else {
-                    afterUL = constructForJoin(ULs.get(promisingQItems.get(i)), ULs.get(promisingQItems.get(j)),
+                    afterUL = constructForJoin(ULs.get(currentQitem), ULs.get(promisingQItems.get(j)),
                             prefixUL);
                     countConstruct++;
                     if (afterUL == null || afterUL.getTwu() < Math.floor(minUtil / coefficient))
@@ -847,8 +826,8 @@ public class AlgoFHUQIMinerCustom {
                 }
 
                 if (afterUL.getTwu() >= Math.floor(minUtil / coefficient)) {
-                    nextNameList.add(afterUL.getSingleItemsetName()); // item can be explored
-//					countnext++;
+                    // Items to be explored
+                    nextNameList.add(afterUL.getSingleItemsetName());
                     nextHUL.put(afterUL.getSingleItemsetName(), afterUL);
                     countUL++;
                     if (afterUL.getSumIUtils() >= minUtil) {
@@ -856,7 +835,6 @@ public class AlgoFHUQIMinerCustom {
                                 afterUL.getSumIUtils());
                         HUQIcount++;
                         nextHWQUI.add(afterUL.getSingleItemsetName());
-//                        System.out.println("next is "+afterUL.getSingleItemsetName()+"util is "+afterUL.getSumIUtils());
                     } else {
                         if (afterUL.getSumIUtils() + afterUL.getSumRUtils() >= minUtil) {
                             nextHWQUI.add(afterUL.getSingleItemsetName());
