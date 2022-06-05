@@ -820,27 +820,31 @@ public class AlgoFHUQIMinerCustom {
 
                 // Improved co-occurrence pruning strategy
                 UtilityListCustom afterUL = null;
-                int sumTWU = 0;
-                for (int ii = currentQitem.getQuantityMin(); ii <= currentQitem.getQuantityMax(); ii++) {
-                    QitemCustom exactQitem = new QitemCustom(currentQitem.getItem(), ii);
-                    for (int tid : pSet) {
-                        List<QitemCustom> projection = mapProjectedTrans.get(tid).get(exactQitem);
-                        if (projection != null) {
-                            for (QitemCustom qitem : projection) {
-                                Integer sum = mapFMAP.get(exactQitem).get(qitem);
-                                if (sum == null)
-                                    continue;
-                                sumTWU += sum;
+                Integer sumTWU = null;
+                Map<QitemCustom, Integer> mapTWUF = mapFMAP.get(currentQitem);
+                if (mapTWUF != null) {
+                    sumTWU = mapTWUF.get(nextQitem);
+                } else {// In case of range Q-itemsets
+                    for (int ii = currentQitem.getQuantityMin(); ii <= currentQitem.getQuantityMax(); ii++) {
+                        QitemCustom exactQitem = new QitemCustom(currentQitem.getItem(), ii);
+                        for (int tid : pSet) {
+                            List<QitemCustom> projection = mapProjectedTrans.get(tid).get(exactQitem);
+                            if (projection != null) {
+                                for (QitemCustom qitem : projection) {
+                                    Integer sum = mapFMAP.get(exactQitem).get(qitem);
+                                    if (sum == null)
+                                        continue;
+                                    sumTWU += sum;
+                                }
                             }
                         }
                     }
                 }
 
-                if (sumTWU < Math.floor(minUtil / coefficient))
+                if (sumTWU == null || sumTWU < Math.floor(minUtil / coefficient))
                     continue;
                 else {
-                    afterUL = constructForJoin(ULs.get(currentQitem), ULs.get(nextQitem),
-                            prefixUL);
+                    afterUL = constructForJoin(ULs.get(currentQitem), ULs.get(nextQitem), prefixUL);
                     countConstruct++;
                     if (afterUL == null || afterUL.getTwu() < Math.floor(minUtil / coefficient))
                         continue;

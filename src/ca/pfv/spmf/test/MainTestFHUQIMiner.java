@@ -37,13 +37,16 @@ public class MainTestFHUQIMiner {
 	public static void main(String[] args) throws IOException {
 
 //		 Paper dataset (from the example in paper)
-//		String inputFileProfitPath = fileToPath("dbHUQI_paper_p.txt");
-//		String inputFileDBPath = fileToPath("dbHUQI_paper.txt");
-//		float minUtilThreshold = 0.25f;
-//		int qrc = 5;
+		String inputFileProfitPath = fileToPath("dbHUQI_paper_p.txt");
+		String inputFileDBPath = fileToPath("dbHUQI_paper.txt");
+		float minUtilThreshold = 0.25f;
+		int qrc = 5;
 //		String output = "results\\paper\\output_paper.txt";
 //		String output = "results\\paper\\output_paper(min).txt";
 //		String output = "results\\paper\\output_paper(max).txt";
+		String output = "results\\paper\\output_paper_pset.txt";
+//		String output = "results\\paper\\output_paper_pset(min).txt";
+//		String output = "results\\paper\\output_paper_pset(max).txt";
 //		String output = "results\\paper\\output_paper_improved.txt";
 //		String output = "results\\paper\\output_paper_improved(min).txt";
 //		String output = "results\\paper\\output_paper_improved(max).txt";
@@ -116,10 +119,10 @@ public class MainTestFHUQIMiner {
 
 
 		// PUMSB DATASET
-		String inputFileProfitPath = fileToPath("datasets\\pumsbf1_p.txt");
-		String inputFileDBPath = fileToPath("datasets\\pumsb.txt");
-		float minUtilThreshold = 0.01f;
-		int qrc = 5;
+//		String inputFileProfitPath = fileToPath("datasets\\pumsbf1_p.txt");
+//		String inputFileDBPath = fileToPath("datasets\\pumsb.txt");
+//		float minUtilThreshold = 0.01f;
+//		int qrc = 5;
 //		String output = "results\\pumsb\\output_pumsb.txt";
 //		String output = "results\\pumsb\\output_pumsb(min).txt";
 //		String output = "results\\pumsb\\output_pumsb(max).txt";
@@ -128,14 +131,14 @@ public class MainTestFHUQIMiner {
 //		String output = "results\\pumsb\\output_pumsb_improved(max).txt";
 //		String output = "results\\pumsb\\output_pumsb_improved_pset.txt";
 //		String output = "results\\pumsb\\output_pumsb_improved_pset(min).txt";
-		String output = "results\\pumsb\\output_pumsb_improved_pset(max).txt";
+//		String output = "results\\pumsb\\output_pumsb_improved_pset(max).txt";
 
 
 		// Run the algorithm
 		// The combination method  (there are three possibilities )
-//		EnumCombination combinationmethod = EnumCombination.COMBINEALL;
+		EnumCombination combinationmethod = EnumCombination.COMBINEALL;
 //		EnumCombination combinationmethod = EnumCombination.COMBINEMIN;
-		EnumCombination combinationmethod = EnumCombination.COMBINEMAX;
+//		EnumCombination combinationmethod = EnumCombination.COMBINEMAX;
 
 //		AlgoFHUQIMiner algo = new AlgoFHUQIMiner();
 		AlgoFHUQIMinerCustom algo = new AlgoFHUQIMinerCustom();
