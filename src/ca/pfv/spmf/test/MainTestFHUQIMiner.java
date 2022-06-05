@@ -37,22 +37,22 @@ public class MainTestFHUQIMiner {
 	public static void main(String[] args) throws IOException {
 
 //		 Paper dataset (from the example in paper)
-		String inputFileProfitPath = fileToPath("dbHUQI_paper_p.txt");
-		String inputFileDBPath = fileToPath("dbHUQI_paper.txt");
-		float minUtilThreshold = 0.25f;
-		int qrc = 5;
+//		String inputFileProfitPath = fileToPath("dbHUQI_paper_p.txt");
+//		String inputFileDBPath = fileToPath("dbHUQI_paper.txt");
+//		float minUtilThreshold = 0.25f;
+//		int qrc = 5;
 //		String output = "results\\paper\\output_paper.txt";
 //		String output = "results\\paper\\output_paper(min).txt";
 //		String output = "results\\paper\\output_paper(max).txt";
-		String output = "results\\paper\\output_paper_pset.txt";
+//		String output = "results\\paper\\output_paper_pset.txt";
 //		String output = "results\\paper\\output_paper_pset(min).txt";
 //		String output = "results\\paper\\output_paper_pset(max).txt";
 //		String output = "results\\paper\\output_paper_improved.txt";
 //		String output = "results\\paper\\output_paper_improved(min).txt";
 //		String output = "results\\paper\\output_paper_improved(max).txt";
-//		String output = "results\\paper\\output_paper_improved_pset.txt";
-//		String output = "results\\paper\\output_paper_improved_pset(min).txt";
-//		String output = "results\\paper\\output_paper_improved_pset(max).txt";
+//		String output = "results\\paper\\output_paper_combined.txt";
+//		String output = "results\\paper\\output_paper_combined(min).txt";
+//		String output = "results\\paper\\output_paper_combined(max).txt";
 
 
 		// FOODMART DATASET
@@ -63,12 +63,15 @@ public class MainTestFHUQIMiner {
 //		String output = "results\\foodmart\\output_foodmart.txt";
 //		String output = "results\\foodmart\\output_foodmart(min).txt";
 //		String output = "results\\foodmart\\output_foodmart(max).txt";
+//		String output = "results\\foodmart\\output_foodmart_pset.txt";
+//		String output = "results\\foodmart\\output_foodmart_pset(min).txt";
+//		String output = "results\\foodmart\\output_foodmart_pset(max).txt";
 //		String output = "results\\foodmart\\output_foodmart_improved.txt";
 //		String output = "results\\foodmart\\output_foodmart_improved(min).txt";
 //		String output = "results\\foodmart\\output_foodmart_improved(max).txt";
-//		String output = "results\\foodmart\\output_foodmart_improved_pset.txt";
-//		String output = "results\\foodmart\\output_foodmart_improved_pset(min).txt";
-//		String output = "results\\foodmart\\output_foodmart_improved_pset(max).txt";
+//		String output = "results\\foodmart\\output_foodmart_combined.txt";
+//		String output = "results\\foodmart\\output_foodmart_combined(min).txt";
+//		String output = "results\\foodmart\\output_foodmart_combined(max).txt";
 
 
 		// BMS1 DATASET
@@ -82,9 +85,12 @@ public class MainTestFHUQIMiner {
 //		String output = "results\\bms1\\output_bms1_improved.txt";
 //		String output = "results\\bms1\\output_bms1_improved(min).txt";
 //		String output = "results\\bms1\\output_bms1_improved(max).txt";
-//		String output = "results\\bms1\\output_bms1_improved_pset.txt";
-//		String output = "results\\bms1\\output_bms1_improved_pset(min).txt";
-//		String output = "results\\bms1\\output_bms1_improved_pset(max).txt";
+//		String output = "results\\bms1\\output_bms1_pset.txt";
+//		String output = "results\\bms1\\output_bms1_pset(min).txt";
+//		String output = "results\\bms1\\output_bms1_pset(max).txt";
+//		String output = "results\\bms1\\output_bms1_combined.txt";
+//		String output = "results\\bms1\\output_bms1_combined(min).txt";
+//		String output = "results\\bms1\\output_bms1_combined(max).txt";
 
 		// BMS2 DATASET
 //		String inputFileProfitPath = fileToPath("datasets\\bmsf2_p.txt");
@@ -97,9 +103,12 @@ public class MainTestFHUQIMiner {
 //		String output = "results\\bms2\\output_bms2_improved.txt";
 //		String output = "results\\bms2\\output_bms2_improved(min).txt";
 //		String output = "results\\bms2\\output_bms2_improved(max).txt";
-//		String output = "results\\bms2\\output_bms2_improved_pset.txt";
-//		String output = "results\\bms2\\output_bms2_improved_pset(min).txt";
-//		String output = "results\\bms2\\output_bms2_improved_pset(max).txt";
+//		String output = "results\\bms2\\output_bms2_pset.txt";
+//		String output = "results\\bms2\\output_bms2_pset(min).txt";
+//		String output = "results\\bms2\\output_bms2_pset(max).txt";
+//		String output = "results\\bms2\\output_bms2_combined.txt";
+//		String output = "results\\bms2\\output_bms2_combined(min).txt";
+//		String output = "results\\bms2\\output_bms2_combined(max).txt";
 
 
 //		// RETAIL DATASET
@@ -113,25 +122,31 @@ public class MainTestFHUQIMiner {
 //		String output = "results\\retail\\output_retail_improved.txt";
 //		String output = "results\\retail\\output_retail_improved(min).txt";
 //		String output = "results\\retail\\output_retail_improved(max).txt";
-//		String output = "results\\retail\\output_retail_improved_pset.txt";
-//		String output = "results\\retail\\output_retail_improved_pset(min).txt";
-//		String output = "results\\retail\\output_retail_improved_pset(max).txt";
+//		String output = "results\\retail\\output_retail_pset.txt";
+//		String output = "results\\retail\\output_retail_pset(min).txt";
+//		String output = "results\\retail\\output_retail_pset(max).txt";
+//		String output = "results\\retail\\output_retail_combined.txt";
+//		String output = "results\\retail\\output_retail_combined(min).txt";
+//		String output = "results\\retail\\output_retail_combined(max).txt";
 
 
 		// PUMSB DATASET
-//		String inputFileProfitPath = fileToPath("datasets\\pumsbf1_p.txt");
-//		String inputFileDBPath = fileToPath("datasets\\pumsb.txt");
-//		float minUtilThreshold = 0.01f;
-//		int qrc = 5;
+		String inputFileProfitPath = fileToPath("datasets\\pumsbf1_p.txt");
+		String inputFileDBPath = fileToPath("datasets\\pumsb.txt");
+		float minUtilThreshold = 0.01f;
+		int qrc = 30;
 //		String output = "results\\pumsb\\output_pumsb.txt";
 //		String output = "results\\pumsb\\output_pumsb(min).txt";
 //		String output = "results\\pumsb\\output_pumsb(max).txt";
 //		String output = "results\\pumsb\\output_pumsb_improved.txt";
 //		String output = "results\\pumsb\\output_pumsb_improved(min).txt";
 //		String output = "results\\pumsb\\output_pumsb_improved(max).txt";
-//		String output = "results\\pumsb\\output_pumsb_improved_pset.txt";
-//		String output = "results\\pumsb\\output_pumsb_improved_pset(min).txt";
-//		String output = "results\\pumsb\\output_pumsb_improved_pset(max).txt";
+		String output = "results\\pumsb\\output_pumsb_pset.txt";
+//		String output = "results\\pumsb\\output_pumsb_pset(min).txt";
+//		String output = "results\\pumsb\\output_pumsb_pset(max).txt";
+//		String output = "results\\pumsb\\output_pumsb_combined.txt";
+//		String output = "results\\pumsb\\output_pumsb_combined(min).txt";
+//		String output = "results\\pumsb\\output_pumsb_combined(max).txt";
 
 
 		// Run the algorithm

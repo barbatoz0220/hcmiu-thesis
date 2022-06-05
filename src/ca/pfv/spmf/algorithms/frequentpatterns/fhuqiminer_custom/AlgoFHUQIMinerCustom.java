@@ -812,26 +812,29 @@ public class AlgoFHUQIMinerCustom {
 
             for (int j = i + 1; j < promisingQItems.size(); j++) {
                 QitemCustom nextQitem = promisingQItems.get(j);
-                List<Integer> pSet = mapPSet.get(nextQitem);
-                if (pSet==null)
+                if (nextQitem.isRange())
                     continue;
                 if (currentQitem.isRange() && j==i+1)
                     continue;
 
-                // Improved co-occurrence pruning strategy
+                List<Integer> pSet = mapPSet.get(nextQitem);
+
+                // Co-occurrence pruning strategy with P-Set
+                // In case of exact Q-itemsets
                 UtilityListCustom afterUL = null;
-                Integer sumTWU = null;
+                Integer sumTWU = 0;
                 Map<QitemCustom, Integer> mapTWUF = mapFMAP.get(currentQitem);
                 if (mapTWUF != null) {
                     sumTWU = mapTWUF.get(nextQitem);
-                } else {// In case of range Q-itemsets
+                } else {
+                    // In case of range Q-itemsets
                     for (int ii = currentQitem.getQuantityMin(); ii <= currentQitem.getQuantityMax(); ii++) {
                         QitemCustom exactQitem = new QitemCustom(currentQitem.getItem(), ii);
                         for (int tid : pSet) {
                             List<QitemCustom> projection = mapProjectedTrans.get(tid).get(exactQitem);
                             if (projection != null) {
                                 for (QitemCustom qitem : projection) {
-                                    Integer sum = mapFMAP.get(exactQitem).get(qitem);
+                                    Integer sum = mapFMAP.get(nextQitem).get(qitem);
                                     if (sum == null)
                                         continue;
                                     sumTWU += sum;
