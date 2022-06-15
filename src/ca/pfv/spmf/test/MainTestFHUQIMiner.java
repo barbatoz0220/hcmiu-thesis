@@ -23,7 +23,9 @@ import java.net.URL;
 
 import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer.AlgoFHUQIMiner;
 import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer.EnumCombination;
-import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom.AlgoFHUQIMinerCustom;
+import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom.AlgoFHUQIMinerCombined;
+import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom.AlgoFHUQIMinerImproved;
+import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom.AlgoFHUQIMinerPSet;
 
 /**
  * Class that shows how to run the FHUQI-Miner algorithm from the source code.
@@ -36,89 +38,72 @@ public class MainTestFHUQIMiner {
 	 */
 	public static void main(String[] args) throws IOException {
 
-//		 Paper dataset (from the example in paper)
-//		String inputFileProfitPath = fileToPath("dbHUQI_paper_p.txt");
-//		String inputFileDBPath = fileToPath("dbHUQI_paper.txt");
-//		float minUtilThreshold = 0.25f;
-//		int qrc = 5;
-//		String output = "results\\paper\\output_paper.txt";
-//		String output = "results\\paper\\output_paper(max).txt";
-//		String output = "results\\paper\\output_paper(min).txt";
-//		String output = "results\\paper\\output_paper_custom.txt";
-//		String output = "results\\paper\\output_paper_custom(min).txt";
-//		String output = "results\\paper\\output_paper_custom(max).txt";
-//		String output = "results\\paper\\output_paper_custom_test3.txt";
-//		String output = "results\\paper\\output_paper_custom_test4.txt";
-//		String output = "results\\paper\\output_paper_custom_test(max).txt";
+		// EXAMPLE IN PAPER
+		String inputFileProfitPath = fileToPath("dbHUQI_paper_p.txt");
+		String inputFileDBPath = fileToPath("dbHUQI_paper.txt");
+		float minUtilThreshold = 0.25f;
+		int qrc = 5;
+		String output = "results\\paper\\output.txt";
 
 
-		// FOODMART DATASET
+//		 FOODMART DATASET
 //		String inputFileProfitPath = fileToPath("datasets\\foodmartf1_p.txt");
 //		String inputFileDBPath = fileToPath("datasets\\foodmart.txt");
-//		float minUtilThreshold = 0.001f;
+//		float minUtilThreshold = 0.0002f;
 //		int qrc = 10;
-//		String output = "results\\foodmart\\output_foodmart.txt";
-//		String output = "results\\foodmart\\output_foodmart(max).txt";
-//		String output = "results\\foodmart\\output_foodmart(min).txt";
-//		String output = "results\\foodmart\\output_foodmart_custom_test.txt";
-//		String output = "results\\foodmart\\output_foodmart_custom_test3.txt";
-//		String output = "results\\foodmart\\output_foodmart_custom(max).txt";
-//		String output = "results\\foodmart\\output_foodmart_custom_test3(max).txt";
-//		String output = "results\\foodmart\\output_foodmart_custom(min).txt";
-//		String output = "results\\foodmart\\output_foodmart_custom_test3(min).txt";
+//		String output = "results\\foodmart\\output.txt";
+
+
+		// BMS1 DATASET
+//		String inputFileProfitPath = fileToPath("datasets\\bmsf1_p.txt");
+//		String inputFileDBPath = fileToPath("datasets\\bms1.txt");
+//		float minUtilThreshold = 0.006f;
+//		int qrc = 10;
+//		String output = "results\\bms1\\output_bms1.txt";
 
 
 		// BMS2 DATASET
-		String inputFileProfitPath = fileToPath("datasets\\bmsf2_p.txt");
-		String inputFileDBPath = fileToPath("datasets\\bms2.txt");
-		float minUtilThreshold = 0.001f;
-		int qrc = 10;
+//		String inputFileProfitPath = fileToPath("datasets\\bmsf2_p.txt");
+//		String inputFileDBPath = fileToPath("datasets\\bms2.txt");
+//		float minUtilThreshold = 0.005f;
+//		int qrc = 10;
 //		String output = "results\\bms2\\output_bms2.txt";
-//		String output = "results\\bms2\\output_bms2(max).txt";
-//		String output = "results\\bms2\\output_bms2(min).txt";
-//		String output = "results\\bms2\\output_bms2_custom_test2.txt";
-//		String output = "results\\bms2\\output_bms2_custom_test3.txt";
-//		String output = "results\\bms2\\output_bms2_custom(max)_test2.txt";
-		String output = "results\\bms2\\output_bms2_custom(max)_test3.txt";
-//		String output = "results\\bms2\\output_bms2_custom(min)_test2.txt";
 
 
-//		// RETAIL DATASET
+		// RETAIL DATASET
 //		String inputFileProfitPath = fileToPath("datasets\\retailf1_p.txt");
 //		String inputFileDBPath = fileToPath("datasets\\retail.txt");
-//		float minUtilThreshold = 0.01f;
+//		float minUtilThreshold = 0.009f;
+//		int qrc = 10;
+//		String output = "results\\retail\\output_retail0.txt";
+
+
+		// CONNECT DATASET
+//		String inputFileProfitPath = fileToPath("datasets\\connectf1_p.txt");
+//		String inputFileDBPath = fileToPath("datasets\\connect.txt");
+//		float minUtilThreshold = 3f;
 //		int qrc = 5;
-//		String output = "results\retail\output_retail.txt";
-//		String output = "results\retail\output_retail(max).txt";
-//		String output = "results\retail\output_retail(min).txt";
-//		String output = "results\\retail\\output_retail_custom.txt";
-//		String output = "results\retail\output_retail_custom(max).txt";
-//		String output = "results\retail\output_retail_custom(min).txt";
+//		String output = "results\\connect\\output_connect.txt";
 
 
 		// PUMSB DATASET
 //		String inputFileProfitPath = fileToPath("datasets\\pumsbf1_p.txt");
 //		String inputFileDBPath = fileToPath("datasets\\pumsb.txt");
-//		float minUtilThreshold = 0.01f;
+//		float minUtilThreshold = 0.012f;
 //		int qrc = 5;
 //		String output = "results\\pumsb\\output_pumsb.txt";
-//		String output = "results\\pumsb\\output_pumsb(max).txt";
-//		String output = "results\\pumsb\\output_pumsb(min).txt";
-//		String output = "results\\pumsb\\output_pumsb_custom.txt";
-//		String output = "results\\pumsb\\output_pumsb_custom_test2.txt";
-//		String output = "results\\pumsb\\output_pumsb_custom(max).txt";
-//		String output = "results\\pumsb\\output_pumsb_custom(min).txt";
-//		String output = "results\\pumsb\\output_pumsb_custom_test2(max).txt";
 
 
 		// Run the algorithm
 		// The combination method  (there are three possibilities )
-		EnumCombination combinationmethod = EnumCombination.COMBINEMAX;
+		EnumCombination combinationmethod = EnumCombination.COMBINEALL;
 //		EnumCombination combinationmethod = EnumCombination.COMBINEMIN;
-//		EnumCombination combinationmethod = EnumCombination.COMBINEALL;
+//		EnumCombination combinationmethod = EnumCombination.COMBINEMAX;
 
-//		AlgoFHUQIMiner algo = new AlgoFHUQIMiner();
-		AlgoFHUQIMinerCustom algo = new AlgoFHUQIMinerCustom();
+		AlgoFHUQIMiner algo = new AlgoFHUQIMiner();
+//		AlgoFHUQIMinerImproved algo = new AlgoFHUQIMinerImproved();
+//		AlgoFHUQIMinerPSet algo = new AlgoFHUQIMinerPSet();
+//		AlgoFHUQIMinerCombined algo = new AlgoFHUQIMinerCombined();
 		algo.runAlgorithm(inputFileDBPath, inputFileProfitPath, minUtilThreshold, qrc, combinationmethod, output);
 		algo.printStatistics();
 	}
