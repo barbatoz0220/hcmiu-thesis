@@ -23,7 +23,6 @@ import java.net.URL;
 
 import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer.AlgoFHUQIMiner;
 import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer.EnumCombination;
-import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom.AlgoFHUQIMinerCombined;
 import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom.AlgoFHUQIMinerImproved;
 import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom.AlgoFHUQIMinerPSet;
 
@@ -39,19 +38,19 @@ public class MainTestFHUQIMiner {
 	public static void main(String[] args) throws IOException {
 
 		// EXAMPLE IN PAPER
-		String inputFileProfitPath = fileToPath("dbHUQI_paper_p.txt");
-		String inputFileDBPath = fileToPath("dbHUQI_paper.txt");
-		float minUtilThreshold = 0.25f;
-		int qrc = 5;
-		String output = "results\\paper\\output.txt";
+//		String inputFileProfitPath = fileToPath("dbHUQI_paper_p.txt");
+//		String inputFileDBPath = fileToPath("dbHUQI_paper.txt");
+//		float minUtilThreshold = 0.25f;
+//		int qrc = 5;
+//		String output = "results\\paper\\output.txt";
 
 
 //		 FOODMART DATASET
-//		String inputFileProfitPath = fileToPath("datasets\\foodmartf1_p.txt");
-//		String inputFileDBPath = fileToPath("datasets\\foodmart.txt");
-//		float minUtilThreshold = 0.0002f;
-//		int qrc = 10;
-//		String output = "results\\foodmart\\output.txt";
+		String inputFileProfitPath = fileToPath("datasets\\foodmartf1_p.txt");
+		String inputFileDBPath = fileToPath("datasets\\foodmart.txt");
+		float minUtilThreshold = 0.0001f;
+		int qrc = 10;
+		String output = "results\\foodmart\\output.txt";
 
 
 		// BMS1 DATASET
@@ -103,7 +102,6 @@ public class MainTestFHUQIMiner {
 		AlgoFHUQIMiner algo = new AlgoFHUQIMiner();
 //		AlgoFHUQIMinerImproved algo = new AlgoFHUQIMinerImproved();
 //		AlgoFHUQIMinerPSet algo = new AlgoFHUQIMinerPSet();
-//		AlgoFHUQIMinerCombined algo = new AlgoFHUQIMinerCombined();
 		algo.runAlgorithm(inputFileDBPath, inputFileProfitPath, minUtilThreshold, qrc, combinationmethod, output);
 		algo.printStatistics();
 	}
