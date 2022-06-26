@@ -64,5 +64,6 @@ The datasets used in this Thesis can be found entirely on the Homepage of the SP
 
 ### On Connect dataset
 <img src="https://user-images.githubusercontent.com/47182649/175821771-6802634c-ae7b-44bf-9afe-d7653c238e5b.png" width="500">
-<img src="https://user-images.githubusercontent.com/47182649/175822285-e50cc868-a185-492d-a06e-2568ecdc4321.png">
+<img src="https://user-images.githubusercontent.com/47182649/175822447-07156d5d-68d2-4dea-96a2-4948b3f519e1.png">
+
 
