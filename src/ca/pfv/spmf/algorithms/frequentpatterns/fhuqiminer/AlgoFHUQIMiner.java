@@ -881,8 +881,8 @@ public class AlgoFHUQIMiner {
 							.indexOf(new Qitem(qItemNameList.get(i).getItem(), ii));
 				}
 			}
-			System.out.println("Current Q-item: " + qItemNameList.get(i));
-			System.out.println("QI: " + qItemNameList);
+//			System.out.println("Current Q-item: " + qItemNameList.get(i));
+//			System.out.println("QI: " + qItemNameList);
 			for (int j = i + 1; j < qItemNameList.size(); j++) {
 
 				if (qItemNameList.get(j).isRange())
@@ -946,11 +946,11 @@ public class AlgoFHUQIMiner {
 										&& afterUL.getSumIutils() >= Math.floor(minUtil / 2))) {
 							candidateList.add(afterUL.getSingleItemsetName());
 							candidateHUL.put(afterUL.getSingleItemsetName(), afterUL);
-							System.out.println("Candidate List: " + candidateList);
+//							System.out.println("Candidate List: " + candidateList);
 						}
 						if (afterUL.getSumIutils() + afterUL.getSumRutils() >= minUtil) {
 							nextHWQUI.add(afterUL.getSingleItemsetName());
-							System.out.println("Next HWQUI: " + nextHWQUI);
+//							System.out.println("Next HWQUI: " + nextHWQUI);
 						}
 					}
 				}

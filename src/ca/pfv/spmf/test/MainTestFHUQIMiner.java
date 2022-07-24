@@ -25,6 +25,7 @@ import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer.AlgoFHUQIMiner;
 import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer.EnumCombination;
 import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom.AlgoFHUQIMinerImproved;
 import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom.AlgoFHUQIMinerPSet;
+import ca.pfv.spmf.algorithms.frequentpatterns.fhuqiminer_custom.AlgoFHUQIMinerPSetTest;
 
 /**
  * Class that shows how to run the FHUQI-Miner algorithm from the source code.
@@ -46,11 +47,11 @@ public class MainTestFHUQIMiner {
 
 
 //		 FOODMART DATASET
-		String inputFileProfitPath = fileToPath("datasets\\foodmartf1_p.txt");
-		String inputFileDBPath = fileToPath("datasets\\foodmart.txt");
-		float minUtilThreshold = 0.0001f;
-		int qrc = 10;
-		String output = "results\\foodmart\\output.txt";
+//		String inputFileProfitPath = fileToPath("datasets\\foodmartf1_p.txt");
+//		String inputFileDBPath = fileToPath("datasets\\foodmart.txt");
+//		float minUtilThreshold = 0.00001f;
+//		int qrc = 10;
+//		String output = "results\\foodmart\\output.txt";
 
 
 		// BMS1 DATASET
@@ -62,11 +63,11 @@ public class MainTestFHUQIMiner {
 
 
 		// BMS2 DATASET
-//		String inputFileProfitPath = fileToPath("datasets\\bmsf2_p.txt");
-//		String inputFileDBPath = fileToPath("datasets\\bms2.txt");
-//		float minUtilThreshold = 0.005f;
-//		int qrc = 10;
-//		String output = "results\\bms2\\output_bms2.txt";
+		String inputFileProfitPath = fileToPath("datasets\\bmsf2_p.txt");
+		String inputFileDBPath = fileToPath("datasets\\bms2.txt");
+		float minUtilThreshold = 0.005f;
+		int qrc = 10;
+		String output = "results\\bms2\\output_bms2.txt";
 
 
 		// RETAIL DATASET
@@ -99,9 +100,10 @@ public class MainTestFHUQIMiner {
 //		EnumCombination combinationmethod = EnumCombination.COMBINEMIN;
 //		EnumCombination combinationmethod = EnumCombination.COMBINEMAX;
 
-		AlgoFHUQIMiner algo = new AlgoFHUQIMiner();
-//		AlgoFHUQIMinerImproved algo = new AlgoFHUQIMinerImproved();
+//		AlgoFHUQIMiner algo = new AlgoFHUQIMiner();
+		AlgoFHUQIMinerImproved algo = new AlgoFHUQIMinerImproved();
 //		AlgoFHUQIMinerPSet algo = new AlgoFHUQIMinerPSet();
+//		AlgoFHUQIMinerPSetTest algo = new AlgoFHUQIMinerPSetTest();
 		algo.runAlgorithm(inputFileDBPath, inputFileProfitPath, minUtilThreshold, qrc, combinationmethod, output);
 		algo.printStatistics();
 	}
