@@ -4,6 +4,11 @@ By Pham Hoang Nam Anh, ITITIU18007
 Under the supervison of Associate Professor Loan Nguyen T. T.
 
 And the review of Doctor Tan L. D.
+## Installation method
+- Download the repository (with SPMF library included)
+- Import the project onto an IDE of choice
+- The code for this project should be available in the `src/ca/pfv/spmf/algorithms/frequentpatterns/fhuqiminer_custom/` folder
+- The main function and other settings can be changed and executed via `src/ca/pfv/spmf/test/MainTestFHUQIMiner.java`
 
 ## Introduction
 This is the base repository for my Thesis report at International University, HCMC, Vietnam for the Spring Semester of 2022
