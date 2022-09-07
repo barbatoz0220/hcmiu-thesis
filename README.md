@@ -4,7 +4,7 @@ By Pham Hoang Nam Anh, ITITIU18007
 Under the supervison of Associate Professor Loan Nguyen T. T.
 
 And the review of Doctor Tan L. D.
-## Installation method
+## Installation
 - Download the repository (with SPMF library included)
 - Import the project onto an IDE of choice
 - The code for this project should be available in the `src/ca/pfv/spmf/algorithms/frequentpatterns/fhuqiminer_custom/` folder
